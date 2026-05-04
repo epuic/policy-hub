@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: 248 250 252;
+    --bg-elevated: 255 255 255;
+    --border: 226 232 240;
+    --text: 15 23 42;
+    --text-muted: 100 116 139;
+  }
+
+  .dark {
+    --bg: 7 11 22;
+    --bg-elevated: 15 21 38;
+    --border: 30 41 59;
+    --text: 241 245 249;
+    --text-muted: 148 163 184;
+  }
+
+  * {
+    border-color: rgb(var(--border));
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    background: rgb(var(--bg));
+    color: rgb(var(--text));
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--border));
+    border-radius: 8px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--text-muted) / 0.4);
+  }
+}
+
+@layer components {
+  .surface {
+    background: rgb(var(--bg-elevated));
+    border: 1px solid rgb(var(--border));
+  }
+
+  .gradient-bg {
+    background: radial-gradient(
+        ellipse 80% 80% at 50% -20%,
+        rgba(59, 104, 247, 0.25),
+        transparent
+      ),
+      radial-gradient(
+        ellipse 50% 50% at 90% 110%,
+        rgba(168, 85, 247, 0.18),
+        transparent
+      );
+  }
+
+  .glass {
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.6);
+  }
+  .dark .glass {
+    background: rgba(15, 21, 38, 0.6);
+  }
+}
