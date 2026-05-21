@@ -14,7 +14,7 @@ export default function ThemeToggle({ className }) {
         'hover:bg-slate-50 dark:hover:bg-slate-800 transition',
         className,
       )}
-      title="Schimbă tema"
+      title="Toggle theme"
     >
       {theme === 'dark' ? (
         <Sun className="h-4 w-4" />

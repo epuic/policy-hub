@@ -7,10 +7,15 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface BuildingRepository extends JpaRepository<Building, Long> {
+
+    @Override
+    @EntityGraph(attributePaths = {"owner", "city", "city.county", "city.county.country", "riskFactors"})
+    List<Building> findAll();
 
     @EntityGraph(attributePaths = {"owner", "city", "city.county", "city.county.country", "riskFactors"})
     Optional<Building> findById(Long id);

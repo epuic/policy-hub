@@ -3,6 +3,8 @@ import api from '../lib/api'
 export const currenciesApi = {
   list: (params = {}) =>
     api.get('/v2/admin/currencies', { params }).then((r) => r.data),
+  listForBroker: (params = {}) =>
+    api.get('/v2/brokers/currencies', { params }).then((r) => r.data),
   get: (id) => api.get(`/v2/admin/currencies/${id}`).then((r) => r.data),
   create: (body) => api.post('/v2/admin/currencies', body).then((r) => r.data),
   update: (id, body) =>

@@ -9,6 +9,7 @@ import com.endava.insurance.insurance_service.domain.enums.BrokerStatus;
 import com.endava.insurance.insurance_service.domain.exception.ResourceNotFoundException;
 import com.endava.insurance.insurance_service.domain.exception.ValidationException;
 import com.endava.insurance.insurance_service.domain.model.Broker;
+import com.endava.insurance.insurance_service.domain.model.auth.BrokerAuth;
 import com.endava.insurance.insurance_service.persistence.repository.BrokerRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -88,18 +89,23 @@ class BrokerServiceImplTest {
         Broker broker = mock(Broker.class);
         BrokerUpdateDTO update = new BrokerUpdateDTO("New Name", "new@b.com", "+40222", BigDecimal.ONE);
         Broker saved = mock(Broker.class);
+        BrokerAuth auth = mock(BrokerAuth.class);
         BrokerResponseDTO dto = new BrokerResponseDTO(id, "BRK1", "New Name", "new@b.com", "+40222", BrokerStatus.ACTIVE, BigDecimal.ONE);
 
         when(brokerRepository.findById(id)).thenReturn(Optional.of(broker));
         doNothing().when(brokerValidator).validateBrokerUpdate(broker, update);
         doNothing().when(brokerMapper).updateEntityFromRequest(update, broker);
         when(brokerRepository.save(broker)).thenReturn(saved);
+        when(brokerAuthRepository.findByBrokerId(id)).thenReturn(Optional.of(auth));
+        when(auth.getEmail()).thenReturn("old@b.com");
         when(brokerMapper.toResponse(saved)).thenReturn(dto);
 
         BrokerResponseDTO result = brokerService.update(id, update);
 
         assertThat(result).isEqualTo(dto);
         verify(brokerMapper).updateEntityFromRequest(update, broker);
+        verify(auth).updateEmail("new@b.com");
+        verify(brokerAuthRepository).save(auth);
     }
 
     @Test

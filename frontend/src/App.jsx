@@ -8,6 +8,7 @@ import {
   Percent,
   ShieldAlert,
   FileBarChart2,
+  BrainCircuit,
 } from 'lucide-react'
 
 import ProtectedRoute from './components/ProtectedRoute'
@@ -33,22 +34,24 @@ import Currencies from './pages/admin/Currencies'
 import FeeConfigurations from './pages/admin/FeeConfigurations'
 import RiskFactorConfigurations from './pages/admin/RiskFactorConfigurations'
 import Reports from './pages/admin/Reports'
+import AiInsights from './pages/admin/AiInsights'
 
 import { useAuth } from './contexts/AuthContext'
 
 const BROKER_NAV = [
-  { to: '/broker', label: 'Panou de bord', icon: LayoutDashboard, end: true },
-  { to: '/broker/clients', label: 'Clienți', icon: Users },
-  { to: '/broker/policies', label: 'Politici', icon: ScrollText },
+  { to: '/broker', label: 'Dashboard', icon: LayoutDashboard, end: true },
+  { to: '/broker/clients', label: 'Clients', icon: Users },
+  { to: '/broker/policies', label: 'Policies', icon: ScrollText },
 ]
 
 const ADMIN_NAV = [
-  { to: '/admin', label: 'Panou admin', icon: LayoutDashboard, end: true },
-  { to: '/admin/brokers', label: 'Brokeri', icon: Users2 },
-  { to: '/admin/currencies', label: 'Monede', icon: Coins },
-  { to: '/admin/fees', label: 'Taxe', icon: Percent },
-  { to: '/admin/risk-factors', label: 'Ajustări risc', icon: ShieldAlert },
-  { to: '/admin/reports', label: 'Rapoarte', icon: FileBarChart2 },
+  { to: '/admin', label: 'Admin Dashboard', icon: LayoutDashboard, end: true },
+  { to: '/admin/brokers', label: 'Brokers', icon: Users2 },
+  { to: '/admin/currencies', label: 'Currencies', icon: Coins },
+  { to: '/admin/fees', label: 'Fees', icon: Percent },
+  { to: '/admin/risk-factors', label: 'Risk Adjustments', icon: ShieldAlert },
+  { to: '/admin/reports', label: 'Reports', icon: FileBarChart2 },
+  { to: '/admin/ai', label: 'AI Insights', icon: BrainCircuit },
 ]
 
 function RootRedirect() {
@@ -64,7 +67,6 @@ export default function App() {
       <Route path="/" element={<RootRedirect />} />
       <Route path="/login" element={<Login />} />
 
-      {/* Broker routes */}
       <Route
         element={
           <ProtectedRoute role="BROKER">
@@ -88,11 +90,10 @@ export default function App() {
         <Route path="/broker/policies/:id" element={<PolicyDetail />} />
       </Route>
 
-      {/* Admin routes */}
       <Route
         element={
           <ProtectedRoute role="ADMIN">
-            <AppLayout sidebarItems={ADMIN_NAV} subtitle="Administrator" />
+            <AppLayout sidebarItems={ADMIN_NAV} subtitle="Admin" />
           </ProtectedRoute>
         }
       >
@@ -104,6 +105,7 @@ export default function App() {
         <Route path="/admin/fees" element={<FeeConfigurations />} />
         <Route path="/admin/risk-factors" element={<RiskFactorConfigurations />} />
         <Route path="/admin/reports" element={<Reports />} />
+        <Route path="/admin/ai" element={<AiInsights />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

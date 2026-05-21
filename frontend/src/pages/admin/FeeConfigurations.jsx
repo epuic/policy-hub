@@ -5,6 +5,7 @@ import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
 import Input from '../../components/ui/Input'
 import Select from '../../components/ui/Select'
+import DatePicker from '../../components/ui/DatePicker'
 import Spinner from '../../components/ui/Spinner'
 import Modal from '../../components/ui/Modal'
 import EmptyState from '../../components/ui/EmptyState'
@@ -14,7 +15,7 @@ import { feesApi } from '../../api/fees'
 import { useToast } from '../../contexts/ToastContext'
 import { apiError } from '../../lib/api'
 import { FEE_TYPES, labelFor } from '../../utils/constants'
-import { formatDate } from '../../lib/utils'
+import { formatDate, numberOrNull } from '../../lib/utils'
 
 export default function FeeConfigurations() {
   const toast = useToast()
@@ -80,16 +81,16 @@ export default function FeeConfigurations() {
     try {
       const payload = {
         ...form,
-        percentage: Number(form.percentage),
+        percentage: numberOrNull(form.percentage),
         effectiveFrom: form.effectiveFrom || null,
         effectiveTo: form.effectiveTo || null,
       }
       if (editing) {
         await feesApi.update(editing.id, payload)
-        toast.success('Taxă actualizată')
+        toast.success('Fee updated')
       } else {
         await feesApi.create(payload)
-        toast.success('Taxă creată')
+        toast.success('Fee created')
       }
       setOpen(false)
       fetch()
@@ -105,14 +106,14 @@ export default function FeeConfigurations() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-            Configurări de taxe
+            Fee Configurations
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Comisioane, ajustări și taxe administrative
+            Broker commissions, risk adjustments, and administrative fees
           </p>
         </div>
         <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
-          Configurare nouă
+          New Configuration
         </Button>
       </div>
 
@@ -120,18 +121,18 @@ export default function FeeConfigurations() {
         {loading ? (
           <Spinner />
         ) : data.content.length === 0 ? (
-          <EmptyState icon={Percent} title="Nicio configurare" />
+          <EmptyState icon={Percent} title="No configurations" />
         ) : (
           <>
             <Table>
               <THead>
                 <TR>
-                  <TH>Nume</TH>
-                  <TH>Tip</TH>
-                  <TH>Procent</TH>
-                  <TH>Valabilitate</TH>
-                  <TH>Activ</TH>
-                  <TH className="text-right">Acțiuni</TH>
+                  <TH>Name</TH>
+                  <TH>Type</TH>
+                  <TH>Percentage</TH>
+                  <TH>Validity</TH>
+                  <TH>Active</TH>
+                  <TH className="text-right">Actions</TH>
                 </TR>
               </THead>
               <TBody>
@@ -145,20 +146,16 @@ export default function FeeConfigurations() {
                     </TD>
                     <TD className="font-semibold">{f.percentage}%</TD>
                     <TD className="text-xs text-slate-500">
-                      {formatDate(f.effectiveFrom)} → {formatDate(f.effectiveTo)}
+                      {formatDate(f.effectiveFrom)} to {formatDate(f.effectiveTo)}
                     </TD>
                     <TD>
                       <Badge variant={f.active ? 'success' : 'muted'}>
-                        {f.active ? 'ACTIV' : 'INACTIV'}
+                        {f.active ? 'ACTIVE' : 'INACTIVE'}
                       </Badge>
                     </TD>
                     <TD>
                       <div className="flex justify-end">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => openEdit(f)}
-                        >
+                        <Button size="icon" variant="ghost" onClick={() => openEdit(f)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
                       </div>
@@ -167,11 +164,7 @@ export default function FeeConfigurations() {
                 ))}
               </TBody>
             </Table>
-            <Pagination
-              page={data.number || 0}
-              totalPages={data.totalPages || 0}
-              onChange={setPage}
-            />
+            <Pagination page={data.number || 0} totalPages={data.totalPages || 0} onChange={setPage} />
           </>
         )}
       </Card>
@@ -179,25 +172,16 @@ export default function FeeConfigurations() {
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title={editing ? 'Editează taxă' : 'Taxă nouă'}
+        title={editing ? 'Edit Fee' : 'New Fee'}
+        contentClassName="overflow-visible"
       >
-        <form onSubmit={save} className="space-y-4">
-          <Input
-            label="Nume"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            required
-          />
-          <Select
-            label="Tip"
-            value={form.type}
-            onChange={(e) => setForm({ ...form, type: e.target.value })}
-            options={FEE_TYPES}
-          />
+        <form onSubmit={save} noValidate className="space-y-4">
+          <Input label="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+          <Select label="Type" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} options={FEE_TYPES} />
           <Input
             type="number"
             step="0.01"
-            label="Procent (%)"
+            label="Percentage (%)"
             value={form.percentage}
             onChange={(e) => setForm({ ...form, percentage: e.target.value })}
             min={0}
@@ -205,17 +189,15 @@ export default function FeeConfigurations() {
             required
           />
           <div className="grid grid-cols-2 gap-3">
-            <Input
-              type="date"
-              label="Începând de la"
+            <DatePicker
+              label="Effective From"
               value={form.effectiveFrom}
-              onChange={(e) => setForm({ ...form, effectiveFrom: e.target.value })}
+              onChange={(value) => setForm({ ...form, effectiveFrom: value })}
             />
-            <Input
-              type="date"
-              label="Până la"
+            <DatePicker
+              label="Effective To"
               value={form.effectiveTo}
-              onChange={(e) => setForm({ ...form, effectiveTo: e.target.value })}
+              onChange={(value) => setForm({ ...form, effectiveTo: value })}
             />
           </div>
           <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
@@ -225,14 +207,14 @@ export default function FeeConfigurations() {
               checked={form.active}
               onChange={(e) => setForm({ ...form, active: e.target.checked })}
             />
-            Activă
+            Active
           </label>
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" type="button" onClick={() => setOpen(false)}>
-              Anulează
+              Cancel
             </Button>
             <Button type="submit" loading={saving}>
-              Salvează
+              Save
             </Button>
           </div>
         </form>

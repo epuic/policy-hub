@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Users, Building2, ScrollText, TrendingUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import StatCard from '../../components/dashboard/StatCard'
-import { Card, CardHeader, CardBody } from '../../components/ui/Card'
+import { Card, CardHeader } from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
 import { Table, THead, TH, TBody, TR, TD } from '../../components/ui/Table'
 import { clientsApi } from '../../api/clients'
@@ -43,7 +43,7 @@ export default function BrokerDashboard() {
         })
         setRecent(all.content || [])
       } catch (err) {
-        toast.error(apiError(err, 'Nu s-au putut încărca statisticile'))
+        toast.error(apiError(err))
       } finally {
         if (!cancel) setLoading(false)
       }
@@ -56,54 +56,30 @@ export default function BrokerDashboard() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-          Panou de bord
+          Dashboard
         </h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Prezentare generală a activității tale de broker
+          Overview of your broker activity
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          icon={Users}
-          label="Clienți"
-          value={stats.clients}
-          accent="brand"
-          loading={loading}
-        />
-        <StatCard
-          icon={ScrollText}
-          label="Politici totale"
-          value={stats.policies}
-          accent="violet"
-          loading={loading}
-        />
-        <StatCard
-          icon={TrendingUp}
-          label="Politici active"
-          value={stats.active}
-          accent="emerald"
-          loading={loading}
-        />
-        <StatCard
-          icon={Building2}
-          label="Ciorne"
-          value={stats.drafts}
-          accent="amber"
-          loading={loading}
-        />
+        <StatCard icon={Users} label="Clients" value={stats.clients} accent="brand" loading={loading} />
+        <StatCard icon={ScrollText} label="Total Policies" value={stats.policies} accent="violet" loading={loading} />
+        <StatCard icon={TrendingUp} label="Active Policies" value={stats.active} accent="emerald" loading={loading} />
+        <StatCard icon={Building2} label="Drafts" value={stats.drafts} accent="amber" loading={loading} />
       </div>
 
       <Card>
         <CardHeader
-          title="Ultimele politici"
-          subtitle="Cele mai recente 5 politici"
+          title="Recent Policies"
+          subtitle="Latest 5 policies"
           actions={
             <Link
               to="/broker/policies"
               className="text-xs font-medium text-brand-600 hover:underline"
             >
-              Vezi toate →
+              View all
             </Link>
           }
         />
@@ -111,19 +87,19 @@ export default function BrokerDashboard() {
           <Spinner />
         ) : recent.length === 0 ? (
           <EmptyState
-            title="Nicio politică"
-            message="Creează prima politică pentru a începe"
+            title="No policies"
+            message="Create your first policy to get started"
           />
         ) : (
           <Table>
             <THead>
               <TR>
-                <TH>Nr. Poliță</TH>
+                <TH>Policy No.</TH>
                 <TH>Client</TH>
-                <TH>Clădire</TH>
+                <TH>Building</TH>
                 <TH>Start</TH>
-                <TH>Final</TH>
-                <TH>Primă</TH>
+                <TH>End</TH>
+                <TH>Premium</TH>
                 <TH>Status</TH>
               </TR>
             </THead>

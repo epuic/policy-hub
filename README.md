@@ -2,6 +2,8 @@
 
 A full-stack property insurance management platform built with Spring Boot, React and PostgreSQL. The application supports policy lifecycle management, configurable premium calculation, AI-based segmentation for clients and buildings, PDF policy document generation and email delivery when a policy is activated.
 
+![Insurance Management Platform overview](docs/images/system-overview.svg)
+
 ## Overview
 
 The platform is designed for managing property insurance operations through two main roles:
@@ -10,6 +12,16 @@ The platform is designed for managing property insurance operations through two 
 - Brokers manage clients, buildings and insurance policies from draft creation to activation or cancellation.
 
 The backend exposes secured REST APIs and contains the core insurance business logic, while the frontend provides a role-based interface for daily operational workflows. The system also includes a Python-based AI module that uses K-Prototypes clustering to segment mixed numerical and categorical insurance data.
+
+## Visual Overview
+
+### Policy Lifecycle
+
+![Policy lifecycle](docs/images/policy-flow.svg)
+
+### AI Segmentation Flow
+
+![AI segmentation flow](docs/images/ai-segmentation.svg)
 
 ## Main Features
 
@@ -62,13 +74,13 @@ The backend exposes secured REST APIs and contains the core insurance business l
 
 ```text
 insurance-service/
-├── frontend/                 # React frontend
-├── ml/                       # Python AI segmentation module
-├── scripts/                  # Database/demo helper scripts
-├── src/main/java/            # Spring Boot backend source code
-├── src/main/resources/       # Application config, SQL data and templates
-├── pom.xml                   # Backend dependencies and build config
-└── README.md
+|-- frontend/                 # React frontend
+|-- ml/                       # Python AI segmentation module
+|-- scripts/                  # Database/demo helper scripts
+|-- src/main/java/            # Spring Boot backend source code
+|-- src/main/resources/       # Application config, SQL data and templates
+|-- pom.xml                   # Backend dependencies and build config
+`-- README.md
 ```
 
 ## Prerequisites
@@ -207,4 +219,3 @@ The `scripts` folder contains helper SQL scripts that can be used to populate th
 - The application is intended for educational and portfolio purposes.
 - The insurance calculations are configurable and designed to demonstrate real-world policy administration concepts.
 - The AI clustering output is meant to support analysis and decision-making, not to replace manual underwriting or business validation.
-

@@ -1,45 +1,45 @@
 export const CLIENT_TYPES = [
-  { value: 'INDIVIDUAL', label: 'Persoană fizică' },
-  { value: 'COMPANY', label: 'Companie' },
+  { value: 'INDIVIDUAL', label: 'Individual' },
+  { value: 'COMPANY', label: 'Company' },
 ]
 
 export const BUILDING_TYPES = [
-  { value: 'RESIDENTIAL', label: 'Rezidențial' },
-  { value: 'OFFICE', label: 'Birouri' },
+  { value: 'RESIDENTIAL', label: 'Residential' },
+  { value: 'OFFICE', label: 'Office' },
   { value: 'INDUSTRIAL', label: 'Industrial' },
 ]
 
 export const POLICY_STATUSES = [
-  { value: 'DRAFT', label: 'Ciornă' },
-  { value: 'ACTIVE', label: 'Activă' },
-  { value: 'EXPIRED', label: 'Expirată' },
-  { value: 'CANCELLED', label: 'Anulată' },
+  { value: 'DRAFT', label: 'Draft' },
+  { value: 'ACTIVE', label: 'Active' },
+  { value: 'EXPIRED', label: 'Expired' },
+  { value: 'CANCELLED', label: 'Cancelled' },
 ]
 
 export const BROKER_STATUSES = [
-  { value: 'ACTIVE', label: 'Activ' },
-  { value: 'INACTIVE', label: 'Inactiv' },
+  { value: 'ACTIVE', label: 'Active' },
+  { value: 'INACTIVE', label: 'Inactive' },
 ]
 
 export const FEE_TYPES = [
-  { value: 'BROKER_COMMISSION', label: 'Comision broker' },
-  { value: 'RISK_ADJUSTMENT', label: 'Ajustare risc' },
-  { value: 'ADMIN_FEE', label: 'Taxă administrativă' },
+  { value: 'BROKER_COMMISSION', label: 'Broker commission' },
+  { value: 'RISK_ADJUSTMENT', label: 'Risk adjustment' },
+  { value: 'ADMIN_FEE', label: 'Administrative fee' },
 ]
 
 export const RISK_FACTOR_TYPES = [
-  { value: 'FLOOD_ZONE', label: 'Zonă inundații' },
-  { value: 'EARTHQUAKE_RISK_ZONE', label: 'Zonă seismică' },
-  { value: 'WINDSTORM_ZONE', label: 'Zonă vânturi puternice' },
-  { value: 'LANDSLIDE_RISK', label: 'Risc alunecări teren' },
+  { value: 'FLOOD_ZONE', label: 'Flood zone' },
+  { value: 'EARTHQUAKE_RISK_ZONE', label: 'Earthquake risk zone' },
+  { value: 'WINDSTORM_ZONE', label: 'Windstorm zone' },
+  { value: 'LANDSLIDE_RISK', label: 'Landslide risk' },
 ]
 
 export const RISK_FACTOR_CONFIG_LEVELS = [
-  { value: 'COUNTRY', label: 'Țară' },
-  { value: 'COUNTY', label: 'Județ' },
-  { value: 'CITY', label: 'Oraș' },
-  { value: 'BUILDING_TYPE', label: 'Tip clădire' },
-  { value: 'RISK_FACTOR_TYPE', label: 'Tip factor de risc' },
+  { value: 'COUNTRY', label: 'Country' },
+  { value: 'COUNTY', label: 'County' },
+  { value: 'CITY', label: 'City' },
+  { value: 'BUILDING_TYPE', label: 'Building type' },
+  { value: 'RISK_FACTOR_TYPE', label: 'Risk factor type' },
 ]
 
 export function labelFor(list, value) {

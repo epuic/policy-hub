@@ -1,1 +1,1 @@
-// Fișier nefolosit - entry point real este main.jsx
+// Unused file. The real entry point is main.jsx.

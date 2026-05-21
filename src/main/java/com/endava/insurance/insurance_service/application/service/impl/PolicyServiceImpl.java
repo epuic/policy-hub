@@ -1,8 +1,10 @@
 package com.endava.insurance.insurance_service.application.service.impl;
 
+import com.endava.insurance.insurance_service.application.dto.policy.PremiumAdjustmentDTO;
 import com.endava.insurance.insurance_service.application.dto.policy.PolicyCancelDTO;
 import com.endava.insurance.insurance_service.application.dto.policy.PolicyCreateDTO;
 import com.endava.insurance.insurance_service.application.dto.policy.PolicyResponseDTO;
+import com.endava.insurance.insurance_service.application.event.PolicyActivatedEvent;
 import com.endava.insurance.insurance_service.application.mapper.policy.PolicyMapper;
 import com.endava.insurance.insurance_service.application.service.contract.PolicyService;
 import com.endava.insurance.insurance_service.application.service.premium.PolicyPremiumCalculator;
@@ -12,10 +14,13 @@ import com.endava.insurance.insurance_service.domain.exception.ResourceNotFoundE
 import com.endava.insurance.insurance_service.domain.exception.ValidationException;
 import com.endava.insurance.insurance_service.domain.model.Building;
 import com.endava.insurance.insurance_service.domain.model.Policy;
+import com.endava.insurance.insurance_service.domain.model.PolicyPremiumAdjustment;
 import com.endava.insurance.insurance_service.persistence.repository.BuildingRepository;
+import com.endava.insurance.insurance_service.persistence.repository.PolicyPremiumAdjustmentRepository;
 import com.endava.insurance.insurance_service.persistence.repository.PolicyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -38,6 +44,8 @@ public class PolicyServiceImpl implements PolicyService {
     private final PolicyValidator policyValidator;
     private final PolicyPremiumCalculator premiumCalculator;
     private final BuildingRepository buildingRepository;
+    private final PolicyPremiumAdjustmentRepository premiumAdjustmentRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -53,9 +61,25 @@ public class PolicyServiceImpl implements PolicyService {
                 building,
                 request.startDate()
         );
+        List<PremiumAdjustmentDTO> premiumAdjustments = premiumCalculator.getPremiumAdjustments(
+                request.basePremiumAmount(),
+                building,
+                request.startDate()
+        );
 
         Policy policy = policyMapper.toEntity(request, policyNumber, finalPremium);
         Policy saved = policyRepository.save(policy);
+        premiumAdjustmentRepository.saveAll(
+                premiumAdjustments.stream()
+                        .map(adjustment -> new PolicyPremiumAdjustment(
+                                saved,
+                                adjustment.category(),
+                                adjustment.label(),
+                                adjustment.percentage(),
+                                adjustment.amount()
+                        ))
+                        .toList()
+        );
 
         log.info("Policy draft created: id={}, policyNumber={}, basePremium={}, finalPremium={}", 
                 saved.getId(), saved.getPolicyNumber(), saved.getBasePremiumAmount(), saved.getFinalPremium());
@@ -86,6 +110,7 @@ public class PolicyServiceImpl implements PolicyService {
 
         policy.activate();
         Policy saved = policyRepository.save(policy);
+        eventPublisher.publishEvent(new PolicyActivatedEvent(saved.getId()));
 
         log.info("Policy activated: id={}, policyNumber={}", saved.getId(), saved.getPolicyNumber());
         return policyMapper.toResponse(saved);

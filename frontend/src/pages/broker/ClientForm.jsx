@@ -61,10 +61,10 @@ export default function ClientForm() {
           phone: form.phone,
           address: form.address,
         })
-        toast.success('Client actualizat')
+        toast.success('Client updated')
       } else {
         const created = await clientsApi.create(form)
-        toast.success('Client creat')
+        toast.success('Client created')
         navigate(`/broker/clients/${created.id}`)
         return
       }
@@ -78,47 +78,20 @@ export default function ClientForm() {
 
   return (
     <div className="space-y-5 max-w-3xl">
-      <Button
-        variant="ghost"
-        size="sm"
-        leftIcon={<ArrowLeft className="h-4 w-4" />}
-        onClick={() => navigate(-1)}
-      >
-        Înapoi
+      <Button variant="ghost" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate(-1)}>
+        Back
       </Button>
 
       <Card>
         <CardHeader
-          title={isEdit ? 'Editează client' : 'Client nou'}
-          subtitle={
-            isEdit ? 'Actualizează datele clientului' : 'Completează datele clientului'
-          }
+          title={isEdit ? 'Edit Client' : 'New Client'}
+          subtitle={isEdit ? 'Update client details' : 'Complete client details'}
         />
         <CardBody>
-          <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Select
-              label="Tip client"
-              value={form.type}
-              onChange={change('type')}
-              options={CLIENT_TYPES}
-              disabled={isEdit}
-              required
-            />
-            <Input
-              label="Cod țară (ISO)"
-              value={form.countryCode}
-              onChange={change('countryCode')}
-              maxLength={3}
-              disabled={isEdit}
-              required
-              hint="ex: RO, DE, US"
-            />
-            <Input
-              label="Nume"
-              value={form.name}
-              onChange={change('name')}
-              required
-            />
+          <form onSubmit={submit} noValidate className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Select label="Client Type" value={form.type} onChange={change('type')} options={CLIENT_TYPES} disabled={isEdit} required />
+            <Input label="Country Code (ISO)" value={form.countryCode} onChange={change('countryCode')} maxLength={3} disabled={isEdit} required hint="ex: RO, DE, US" />
+            <Input label="Name" value={form.name} onChange={change('name')} required />
             <Input
               label={form.type === 'COMPANY' ? 'CUI / Registration No.' : 'CNP / ID'}
               value={form.identificationNumber}
@@ -126,37 +99,17 @@ export default function ClientForm() {
               disabled={isEdit}
               required
             />
-            <Input
-              type="email"
-              label="Email"
-              value={form.email}
-              onChange={change('email')}
-              required
-            />
-            <Input
-              label="Telefon"
-              value={form.phone}
-              onChange={change('phone')}
-              required
-              hint="10-15 cifre, opțional +"
-            />
+            <Input type="email" label="Email" value={form.email} onChange={change('email')} required />
+            <Input label="Phone" value={form.phone} onChange={change('phone')} required hint="10-15 digits, optional +" />
             <div className="md:col-span-2">
-              <Input
-                label="Adresă"
-                value={form.address}
-                onChange={change('address')}
-              />
+              <Input label="Address" value={form.address} onChange={change('address')} />
             </div>
             <div className="md:col-span-2 flex gap-2 justify-end mt-2">
               <Button variant="outline" type="button" onClick={() => navigate(-1)}>
-                Anulează
+                Cancel
               </Button>
-              <Button
-                type="submit"
-                loading={saving || loading}
-                leftIcon={<Save className="h-4 w-4" />}
-              >
-                {isEdit ? 'Salvează' : 'Creează'}
+              <Button type="submit" loading={saving || loading} leftIcon={<Save className="h-4 w-4" />}>
+                {isEdit ? 'Save' : 'Create'}
               </Button>
             </div>
           </form>

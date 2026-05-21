@@ -10,14 +10,14 @@ export default function NotFound() {
           404
         </div>
         <h1 className="mt-4 text-xl font-semibold text-slate-900 dark:text-slate-100">
-          Pagina nu există
+          Page not found
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          Ruta pe care ai încercat să o accesezi nu a fost găsită.
+          The route you tried to access was not found.
         </p>
         <Link to="/">
           <Button className="mt-6" leftIcon={<Home className="h-4 w-4" />}>
-            Înapoi acasă
+            Back home
           </Button>
         </Link>
       </div>

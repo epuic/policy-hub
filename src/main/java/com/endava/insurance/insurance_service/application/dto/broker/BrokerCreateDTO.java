@@ -8,8 +8,7 @@ import java.math.BigDecimal;
 
 @JsonIgnoreProperties(ignoreUnknown = false)
 public record BrokerCreateDTO(
-        @NotBlank(message = "Broker code is required")
-        @Size(min = 1, max = 50)
+        @Size(max = 50)
         @JsonProperty("brokerCode")
         String brokerCode,
 
@@ -18,6 +17,7 @@ public record BrokerCreateDTO(
         @JsonProperty("name")
         String name,
 
+        @NotBlank(message = "Email is required")
         @Email(message = "Invalid email format")
         @JsonProperty("email")
         String email,

@@ -1,0 +1,40 @@
+<svg width="1120" height="420" viewBox="0 0 1120 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1120" height="420" rx="24" fill="#F7F9FC"/>
+  <text x="64" y="72" fill="#14213D" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700">AI Segmentation</text>
+  <text x="64" y="102" fill="#5E6B82" font-family="Arial, Helvetica, sans-serif" font-size="15">K-Prototypes clustering for mixed insurance data</text>
+
+  <rect x="70" y="150" width="220" height="128" rx="16" fill="white" stroke="#DCE4F2"/>
+  <text x="104" y="190" fill="#14213D" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700">Insurance Data</text>
+  <text x="104" y="220" fill="#5E6B82" font-family="Arial, Helvetica, sans-serif" font-size="13">Clients</text>
+  <text x="104" y="243" fill="#5E6B82" font-family="Arial, Helvetica, sans-serif" font-size="13">Buildings</text>
+  <text x="104" y="266" fill="#5E6B82" font-family="Arial, Helvetica, sans-serif" font-size="13">Risk and policy attributes</text>
+
+  <rect x="450" y="132" width="250" height="164" rx="18" fill="#243B6B"/>
+  <text x="500" y="183" fill="white" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700">K-Prototypes</text>
+  <text x="500" y="217" fill="#D9E3FB" font-family="Arial, Helvetica, sans-serif" font-size="14">Numerical attributes</text>
+  <text x="500" y="241" fill="#D9E3FB" font-family="Arial, Helvetica, sans-serif" font-size="14">Categorical attributes</text>
+  <text x="500" y="265" fill="#D9E3FB" font-family="Arial, Helvetica, sans-serif" font-size="14">Cluster assignment</text>
+
+  <rect x="858" y="86" width="196" height="76" rx="14" fill="#EEF4FF" stroke="#BFD2F3"/>
+  <text x="895" y="120" fill="#1E3A72" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700">Risk Groups</text>
+  <text x="895" y="142" fill="#51627B" font-family="Arial, Helvetica, sans-serif" font-size="13">Segmented profiles</text>
+
+  <rect x="858" y="192" width="196" height="76" rx="14" fill="#F3FBF8" stroke="#B7E3D4"/>
+  <text x="895" y="226" fill="#12664F" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700">Reports</text>
+  <text x="895" y="248" fill="#476C63" font-family="Arial, Helvetica, sans-serif" font-size="13">Portfolio insights</text>
+
+  <rect x="858" y="298" width="196" height="76" rx="14" fill="#FFF7E8" stroke="#F0D29C"/>
+  <text x="895" y="332" fill="#795000" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700">Pricing Support</text>
+  <text x="895" y="354" fill="#7A6541" font-family="Arial, Helvetica, sans-serif" font-size="13">Decision assistance</text>
+
+  <path d="M290 214 H450" stroke="#8CA2C5" stroke-width="3"/>
+  <path d="M438 204 L450 214 L438 224" stroke="#8CA2C5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="331" y="198" fill="#6B7790" font-family="Arial, Helvetica, sans-serif" font-size="13">Python module</text>
+
+  <path d="M700 190 C772 190 790 124 858 124" stroke="#8CA2C5" stroke-width="3" fill="none"/>
+  <path d="M845 117 L858 124 L847 134" stroke="#8CA2C5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M700 214 H858" stroke="#8CA2C5" stroke-width="3"/>
+  <path d="M846 204 L858 214 L846 224" stroke="#8CA2C5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M700 238 C772 238 790 336 858 336" stroke="#8CA2C5" stroke-width="3" fill="none"/>
+  <path d="M846 327 L858 336 L844 344" stroke="#8CA2C5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

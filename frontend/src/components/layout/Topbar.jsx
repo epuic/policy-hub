@@ -1,4 +1,4 @@
-import { LogOut, User } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import ThemeToggle from './ThemeToggle'
 import { initials } from '../../lib/utils'
@@ -42,7 +42,7 @@ export default function Topbar({ title, actions }) {
           <button
             onClick={doLogout}
             className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-rose-600 hover:border-rose-300 dark:hover:border-rose-700 transition"
-            title="Deconectare"
+            title="Sign out"
           >
             <LogOut className="h-4 w-4" />
           </button>

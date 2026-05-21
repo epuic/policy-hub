@@ -14,4 +14,6 @@ public interface BrokerAuthRepository extends JpaRepository<BrokerAuth, Long> {
     Optional<BrokerAuth> findByBrokerId(Long brokerId);
 
     boolean existsByEmail(String email);
+
+    boolean existsByEmailIgnoreCase(String email);
 }

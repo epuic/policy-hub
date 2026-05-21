@@ -24,13 +24,13 @@ export default function Login() {
     setLoading(true)
     try {
       const user = await login(email, password)
-      toast.success(`Bine ai venit, ${user.email}!`)
+      toast.success(`Welcome, ${user.email}!`)
       const target =
         location.state?.from?.pathname ||
         (user.role === 'ADMIN' ? '/admin' : '/broker')
       navigate(target, { replace: true })
     } catch (err) {
-      toast.error(apiError(err, 'Credențiale invalide'))
+      toast.error(apiError(err))
     } finally {
       setLoading(false)
     }
@@ -51,16 +51,16 @@ export default function Login() {
             Insurance Platform
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Autentifică-te pentru a continua
+            Sign in to continue
           </p>
         </div>
 
         <div className="surface rounded-2xl p-6 shadow-xl shadow-brand-900/5">
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={onSubmit} noValidate className="space-y-4">
             <Input
               type="email"
               label="Email"
-              placeholder="nume@companie.com"
+              placeholder="name@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               leftIcon={<Mail className="h-4 w-4" />}
@@ -69,8 +69,8 @@ export default function Login() {
             />
             <Input
               type={showPwd ? 'text' : 'password'}
-              label="Parolă"
-              placeholder="••••••••"
+              label="Password"
+              placeholder="********"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               leftIcon={<Lock className="h-4 w-4" />}
@@ -95,13 +95,13 @@ export default function Login() {
               size="lg"
               loading={loading}
             >
-              Conectare
+              Sign in
             </Button>
           </form>
         </div>
 
         <p className="text-center text-xs text-slate-400 mt-6">
-          © {new Date().getFullYear()} Insurance Platform · Endava
+          Insurance Platform
         </p>
       </div>
     </div>

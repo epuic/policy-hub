@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BrokerServiceImpl implements BrokerService {
 
     private static final String BROKER_NOT_FOUND_MSG = "Broker not found with id: ";
+    private static final String BROKER_CODE_PREFIX = "BRK";
 
     private final BrokerRepository brokerRepository;
     private final BrokerAuthRepository brokerAuthRepository;
@@ -39,7 +40,16 @@ public class BrokerServiceImpl implements BrokerService {
     public BrokerResponseDTO create(BrokerCreateDTO request) throws ValidationException {
         brokerValidator.validateNewBroker(request);
 
-        Broker broker = brokerMapper.toEntity(request);
+        BrokerCreateDTO requestWithGeneratedCode = new BrokerCreateDTO(
+                generateBrokerCode(),
+                request.name(),
+                request.email(),
+                request.phone(),
+                request.password(),
+                request.status(),
+                request.commissionPercentage()
+        );
+        Broker broker = brokerMapper.toEntity(requestWithGeneratedCode);
         Broker saved = brokerRepository.save(broker);
 
         BrokerAuth auth = new BrokerAuth(saved, request.email(), passwordEncoder.encode(request.password()));
@@ -47,6 +57,16 @@ public class BrokerServiceImpl implements BrokerService {
 
         log.info("Broker created: id={}, brokerCode={}", saved.getId(), saved.getBrokerCode());
         return brokerMapper.toResponse(saved);
+    }
+
+    private String generateBrokerCode() {
+        long candidate = brokerRepository.count() + 1;
+        String brokerCode;
+        do {
+            brokerCode = BROKER_CODE_PREFIX + String.format("%04d", candidate++);
+        } while (brokerRepository.existsByBrokerCode(brokerCode));
+
+        return brokerCode;
     }
 
     @Override
@@ -59,12 +79,13 @@ public class BrokerServiceImpl implements BrokerService {
         brokerMapper.updateEntityFromRequest(request, broker);
         Broker saved = brokerRepository.save(broker);
 
-        brokerAuthRepository.findByBrokerId(id).ifPresent(auth -> {
-            if (!auth.getEmail().equals(request.email().trim())) {
-                auth.updateEmail(request.email().trim());
-                brokerAuthRepository.save(auth);
-            }
-        });
+        String newEmail = request.email().trim();
+        BrokerAuth auth = brokerAuthRepository.findByBrokerId(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Broker auth not found with broker id: " + id));
+        if (!auth.getEmail().equals(newEmail)) {
+            auth.updateEmail(newEmail);
+            brokerAuthRepository.save(auth);
+        }
 
         log.info("Broker updated: id={}", saved.getId());
         return brokerMapper.toResponse(saved);

@@ -40,10 +40,10 @@ export default function BrokersList() {
     try {
       if (b.status === 'ACTIVE') {
         await brokersApi.deactivate(b.id)
-        toast.success('Broker dezactivat')
+        toast.success('Broker deactivated')
       } else {
         await brokersApi.activate(b.id)
-        toast.success('Broker activat')
+        toast.success('Broker activated')
       }
       fetch()
     } catch (err) {
@@ -56,17 +56,17 @@ export default function BrokersList() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-            Brokeri
+            Brokers
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Gestionează echipa de brokeri
+            Manage the broker team
           </p>
         </div>
         <Button
           leftIcon={<Plus className="h-4 w-4" />}
           onClick={() => navigate('/admin/brokers/new')}
         >
-          Broker nou
+          New Broker
         </Button>
       </div>
 
@@ -74,19 +74,19 @@ export default function BrokersList() {
         {loading ? (
           <Spinner />
         ) : data.content.length === 0 ? (
-          <EmptyState icon={Users2} title="Niciun broker" />
+          <EmptyState icon={Users2} title="No brokers" />
         ) : (
           <>
             <Table>
               <THead>
                 <TR>
-                  <TH>Cod</TH>
-                  <TH>Nume</TH>
+                  <TH>Code</TH>
+                  <TH>Name</TH>
                   <TH>Email</TH>
-                  <TH>Telefon</TH>
-                  <TH>Comision</TH>
+                  <TH>Phone</TH>
+                  <TH>Commission</TH>
                   <TH>Status</TH>
-                  <TH className="text-right">Acțiuni</TH>
+                  <TH className="text-right">Actions</TH>
                 </TR>
               </THead>
               <TBody>
@@ -99,12 +99,12 @@ export default function BrokersList() {
                     <TD className="font-medium text-slate-900 dark:text-slate-100">
                       {b.name}
                     </TD>
-                    <TD>{b.email || '—'}</TD>
-                    <TD>{b.phone || '—'}</TD>
+                    <TD>{b.email || '-'}</TD>
+                    <TD>{b.phone || '-'}</TD>
                     <TD>
                       {b.commissionPercentage != null
                         ? `${b.commissionPercentage}%`
-                        : '—'}
+                        : '-'}
                     </TD>
                     <TD>
                       <Badge status={b.status}>{b.status}</Badge>
@@ -118,7 +118,7 @@ export default function BrokersList() {
                             e.stopPropagation()
                             navigate(`/admin/brokers/${b.id}/edit`)
                           }}
-                          title="Editează"
+                          title="Edit"
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
@@ -126,7 +126,7 @@ export default function BrokersList() {
                           size="icon"
                           variant="ghost"
                           onClick={(e) => toggleStatus(b, e)}
-                          title={b.status === 'ACTIVE' ? 'Dezactivează' : 'Activează'}
+                          title={b.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
                         >
                           {b.status === 'ACTIVE' ? (
                             <PowerOff className="h-4 w-4 text-rose-500" />

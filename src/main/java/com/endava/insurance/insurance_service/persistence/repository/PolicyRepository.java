@@ -22,10 +22,14 @@ import java.util.Optional;
 public interface PolicyRepository extends JpaRepository<Policy, Long> {
 
     @Override
-    @EntityGraph(attributePaths = {"client", "building", "building.city", "building.city.county", "building.city.county.country", "broker", "currency"})
+    @EntityGraph(attributePaths = {"client", "building", "building.riskFactors", "building.city", "building.city.county", "building.city.county.country", "broker", "currency"})
+    List<Policy> findAll();
+
+    @Override
+    @EntityGraph(attributePaths = {"client", "building", "building.riskFactors", "building.city", "building.city.county", "building.city.county.country", "broker", "currency"})
     Optional<Policy> findById(Long id);
 
-    @EntityGraph(attributePaths = {"client", "building", "building.city", "building.city.county", "building.city.county.country", "broker", "currency"})
+    @EntityGraph(attributePaths = {"client", "building", "building.riskFactors", "building.city", "building.city.county", "building.city.county.country", "broker", "currency"})
     @Query("SELECT p FROM Policy p WHERE " +
             "(:clientId IS NULL OR p.client.id = :clientId) AND " +
             "(:brokerId IS NULL OR p.broker.id = :brokerId) AND " +

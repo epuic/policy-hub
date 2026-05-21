@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Plus, Coins, Pencil } from 'lucide-react'
-import { Card, CardHeader } from '../../components/ui/Card'
+import { Card } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
 import Input from '../../components/ui/Input'
@@ -12,6 +12,7 @@ import { Table, THead, TH, TBody, TR, TD } from '../../components/ui/Table'
 import { currenciesApi } from '../../api/currencies'
 import { useToast } from '../../contexts/ToastContext'
 import { apiError } from '../../lib/api'
+import { numberOrNull } from '../../lib/utils'
 
 export default function Currencies() {
   const toast = useToast()
@@ -66,14 +67,14 @@ export default function Currencies() {
     try {
       const payload = {
         ...form,
-        exchangeRateToBase: Number(form.exchangeRateToBase),
+        exchangeRateToBase: numberOrNull(form.exchangeRateToBase),
       }
       if (editing) {
         await currenciesApi.update(editing.id, payload)
-        toast.success('Monedă actualizată')
+        toast.success('Currency updated')
       } else {
         await currenciesApi.create(payload)
-        toast.success('Monedă creată')
+        toast.success('Currency created')
       }
       setOpen(false)
       fetch()
@@ -89,14 +90,14 @@ export default function Currencies() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-            Monede
+            Currencies
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Configurare monede și cursuri
+            Configure currencies and exchange rates
           </p>
         </div>
         <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
-          Monedă nouă
+          New Currency
         </Button>
       </div>
 
@@ -104,17 +105,17 @@ export default function Currencies() {
         {loading ? (
           <Spinner />
         ) : data.content.length === 0 ? (
-          <EmptyState icon={Coins} title="Nicio monedă configurată" />
+          <EmptyState icon={Coins} title="No currencies configured" />
         ) : (
           <>
             <Table>
               <THead>
                 <TR>
-                  <TH>Cod</TH>
-                  <TH>Nume</TH>
-                  <TH>Curs la bază</TH>
-                  <TH>Activ</TH>
-                  <TH className="text-right">Acțiuni</TH>
+                  <TH>Code</TH>
+                  <TH>Name</TH>
+                  <TH>Base Rate</TH>
+                  <TH>Active</TH>
+                  <TH className="text-right">Actions</TH>
                 </TR>
               </THead>
               <TBody>
@@ -125,16 +126,12 @@ export default function Currencies() {
                     <TD className="font-mono">{c.exchangeRateToBase}</TD>
                     <TD>
                       <Badge variant={c.active ? 'success' : 'muted'}>
-                        {c.active ? 'ACTIV' : 'INACTIV'}
+                        {c.active ? 'ACTIVE' : 'INACTIVE'}
                       </Badge>
                     </TD>
                     <TD>
                       <div className="flex justify-end">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => openEdit(c)}
-                        >
+                        <Button size="icon" variant="ghost" onClick={() => openEdit(c)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
                       </div>
@@ -143,11 +140,7 @@ export default function Currencies() {
                 ))}
               </TBody>
             </Table>
-            <Pagination
-              page={data.number || 0}
-              totalPages={data.totalPages || 0}
-              onChange={setPage}
-            />
+            <Pagination page={data.number || 0} totalPages={data.totalPages || 0} onChange={setPage} />
           </>
         )}
       </Card>
@@ -155,11 +148,11 @@ export default function Currencies() {
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title={editing ? 'Editează monedă' : 'Monedă nouă'}
+        title={editing ? 'Edit Currency' : 'New Currency'}
       >
-        <form onSubmit={save} className="space-y-4">
+        <form onSubmit={save} noValidate className="space-y-4">
           <Input
-            label="Cod"
+            label="Code"
             value={form.code}
             onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
             disabled={!!editing}
@@ -168,15 +161,15 @@ export default function Currencies() {
             hint="ex: RON, EUR, USD"
           />
           <Input
-            label="Nume"
+            label="Name"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             required
           />
           <Input
             type="number"
-            step="0.0001"
-            label="Curs la bază"
+            step="any"
+            label="Base Rate"
             value={form.exchangeRateToBase}
             onChange={(e) =>
               setForm({ ...form, exchangeRateToBase: e.target.value })
@@ -191,14 +184,14 @@ export default function Currencies() {
               checked={form.active}
               onChange={(e) => setForm({ ...form, active: e.target.checked })}
             />
-            Activă
+            Active
           </label>
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" type="button" onClick={() => setOpen(false)}>
-              Anulează
+              Cancel
             </Button>
             <Button type="submit" loading={saving}>
-              Salvează
+              Save
             </Button>
           </div>
         </form>

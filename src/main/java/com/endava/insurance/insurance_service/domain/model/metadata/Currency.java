@@ -21,7 +21,7 @@ public class Currency {
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(name = "exchange_rate_to_base", nullable = false, precision = 12, scale = 2)
+    @Column(name = "exchange_rate_to_base", nullable = false, precision = 12, scale = 6)
     private BigDecimal exchangeRateToBase;
 
     @Column(name = "is_active", nullable = false)

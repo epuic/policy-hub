@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   ArrowLeft,
   Pencil,
@@ -39,7 +39,7 @@ export default function ClientDetail() {
       .finally(() => setLoading(false))
   }, [id])
 
-  if (loading) return <Spinner label="Se încarcă clientul..." />
+  if (loading) return <Spinner label="Loading client..." />
   if (!client) return null
 
   const buildings = client.buildings?.content || []
@@ -54,7 +54,7 @@ export default function ClientDetail() {
           {label}
         </div>
         <div className="text-sm text-slate-800 dark:text-slate-200 truncate">
-          {value || '—'}
+          {value || '-'}
         </div>
       </div>
     </div>
@@ -63,27 +63,15 @@ export default function ClientDetail() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          leftIcon={<ArrowLeft className="h-4 w-4" />}
-          onClick={() => navigate('/broker/clients')}
-        >
-          Clienți
+        <Button variant="ghost" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/broker/clients')}>
+          Clients
         </Button>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            leftIcon={<Pencil className="h-4 w-4" />}
-            onClick={() => navigate(`/broker/clients/${id}/edit`)}
-          >
-            Editează
+          <Button variant="outline" leftIcon={<Pencil className="h-4 w-4" />} onClick={() => navigate(`/broker/clients/${id}/edit`)}>
+            Edit
           </Button>
-          <Button
-            leftIcon={<Plus className="h-4 w-4" />}
-            onClick={() => navigate(`/broker/clients/${id}/buildings/new`)}
-          >
-            Clădire nouă
+          <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => navigate(`/broker/clients/${id}/buildings/new`)}>
+            New Building
           </Button>
         </div>
       </div>
@@ -107,57 +95,46 @@ export default function ClientDetail() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-            <InfoRow
-              icon={Hash}
-              label={client.type === 'COMPANY' ? 'CUI' : 'CNP'}
-              value={client.identificationNumber}
-            />
+            <InfoRow icon={Hash} label={client.type === 'COMPANY' ? 'CUI' : 'CNP'} value={client.identificationNumber} />
             <InfoRow icon={Mail} label="Email" value={client.email} />
-            <InfoRow icon={Phone} label="Telefon" value={client.phone} />
-            <InfoRow icon={Globe} label="Țară" value={client.countryCode} />
-            <InfoRow icon={MapPin} label="Adresă" value={client.address} />
+            <InfoRow icon={Phone} label="Phone" value={client.phone} />
+            <InfoRow icon={Globe} label="Country" value={client.countryCode} />
+            <InfoRow icon={MapPin} label="Address" value={client.address} />
           </div>
         </CardBody>
       </Card>
 
       <Card>
         <CardHeader
-          title="Clădiri"
-          subtitle={`${formatNumber(client.buildings?.totalElements || 0)} clădiri`}
+          title="Buildings"
+          subtitle={`${formatNumber(client.buildings?.totalElements || 0)} buildings`}
           actions={
-            <Button
-              size="sm"
-              leftIcon={<Plus className="h-3.5 w-3.5" />}
-              onClick={() => navigate(`/broker/clients/${id}/buildings/new`)}
-            >
-              Adaugă
+            <Button size="sm" leftIcon={<Plus className="h-3.5 w-3.5" />} onClick={() => navigate(`/broker/clients/${id}/buildings/new`)}>
+              Add
             </Button>
           }
         />
         {buildings.length === 0 ? (
           <EmptyState
             icon={Building2}
-            title="Nicio clădire"
-            message="Adaugă prima clădire pentru acest client"
+            title="No buildings"
+            message="Add the first building for this client"
           />
         ) : (
           <Table>
             <THead>
               <TR>
-                <TH>Adresă</TH>
-                <TH>Oraș / Județ</TH>
-                <TH>Tip</TH>
-                <TH>An</TH>
-                <TH>Suprafață</TH>
-                <TH>Valoare asigurată</TH>
+                <TH>Address</TH>
+                <TH>City / County</TH>
+                <TH>Type</TH>
+                <TH>Year</TH>
+                <TH>Surface Area</TH>
+                <TH>Insured Value</TH>
               </TR>
             </THead>
             <TBody>
               {buildings.map((b) => (
-                <TR
-                  key={b.id}
-                  onClick={() => navigate(`/broker/buildings/${b.id}`)}
-                >
+                <TR key={b.id} onClick={() => navigate(`/broker/buildings/${b.id}`)}>
                   <TD className="font-medium text-slate-900 dark:text-slate-100">
                     {b.fullAddress}
                   </TD>
@@ -173,7 +150,7 @@ export default function ClientDetail() {
                     <Badge status={b.type}>{labelFor(BUILDING_TYPES, b.type)}</Badge>
                   </TD>
                   <TD>{b.constructionYear}</TD>
-                  <TD>{formatNumber(b.surfaceArea)} m²</TD>
+                  <TD>{formatNumber(b.surfaceArea)} sqm</TD>
                   <TD className="font-medium">{formatMoney(b.insuredValue, 'RON')}</TD>
                 </TR>
               ))}

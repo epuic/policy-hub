@@ -50,55 +50,31 @@ export default function AdminDashboard() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-          Panou administrator
+          Admin Dashboard
         </h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Configurare sistem și rapoarte globale
+          System configuration and global reporting
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          icon={Users2}
-          label="Brokeri"
-          value={stats.brokers}
-          accent="brand"
-          loading={loading}
-        />
-        <StatCard
-          icon={Coins}
-          label="Monede"
-          value={stats.currencies}
-          accent="emerald"
-          loading={loading}
-        />
-        <StatCard
-          icon={Percent}
-          label="Taxe configurate"
-          value={stats.fees}
-          accent="amber"
-          loading={loading}
-        />
-        <StatCard
-          icon={ShieldAlert}
-          label="Ajustări risc"
-          value={stats.riskFactors}
-          accent="violet"
-          loading={loading}
-        />
+        <StatCard icon={Users2} label="Brokers" value={stats.brokers} accent="brand" loading={loading} />
+        <StatCard icon={Coins} label="Currencies" value={stats.currencies} accent="emerald" loading={loading} />
+        <StatCard icon={Percent} label="Configured Fees" value={stats.fees} accent="amber" loading={loading} />
+        <StatCard icon={ShieldAlert} label="Risk Adjustments" value={stats.riskFactors} accent="violet" loading={loading} />
       </div>
 
       <Card>
         <CardHeader
-          title="Politici pe țări"
-          subtitle="Distribuție după țară"
+          title="Policies by Country"
+          subtitle="Distribution by country"
         />
         <CardBody>
           {loading ? (
             <Spinner />
           ) : reportData.length === 0 ? (
             <div className="text-sm text-slate-500 py-6 text-center">
-              Nu există date încă
+              No data yet
             </div>
           ) : (
             <div className="space-y-3">
@@ -110,7 +86,7 @@ export default function AdminDashboard() {
                       <span className="text-xs text-slate-400">({r.currencyCode})</span>
                     </span>
                     <span className="text-slate-500 dark:text-slate-400">
-                      {formatNumber(r.policyCount)} politici ·{' '}
+                      {formatNumber(r.policyCount)} policies -{' '}
                       <span className="font-semibold text-slate-700 dark:text-slate-200">
                         {formatMoney(r.totalFinalPremium, r.currencyCode)}
                       </span>

@@ -48,14 +48,15 @@ class BrokerUniquenessValidatorTest {
         @Test
         @DisplayName("when email not in use – does not throw")
         void emailNotInUse_doesNotThrow() throws ValidationException {
-            when(brokerAuthRepository.existsByEmail("new@b.com")).thenReturn(false);
+            when(brokerRepository.existsByEmailIgnoreCase("new@b.com")).thenReturn(false);
+            when(brokerAuthRepository.existsByEmailIgnoreCase("new@b.com")).thenReturn(false);
             assertThatCode(() -> validator.ensureEmailUnique("new@b.com")).doesNotThrowAnyException();
         }
 
         @Test
         @DisplayName("when email already in use – throws ValidationException")
         void emailInUse_throws() {
-            when(brokerAuthRepository.existsByEmail("used@b.com")).thenReturn(true);
+            when(brokerRepository.existsByEmailIgnoreCase("used@b.com")).thenReturn(true);
             assertThatThrownBy(() -> validator.ensureEmailUnique("used@b.com"))
                     .isInstanceOf(ValidationException.class)
                     .hasMessageContaining("Email address is already in use")
@@ -109,14 +110,15 @@ class BrokerUniquenessValidatorTest {
         @Test
         @DisplayName("when email changed and unique – does not throw")
         void emailChangedAndUnique_doesNotThrow() throws ValidationException {
-            when(brokerAuthRepository.existsByEmail("new@b.com")).thenReturn(false);
+            when(brokerRepository.existsByEmailIgnoreCase("new@b.com")).thenReturn(false);
+            when(brokerAuthRepository.existsByEmailIgnoreCase("new@b.com")).thenReturn(false);
             assertThatCode(() -> validator.ensureEmailUniqueIfChanged("old@b.com", "new@b.com")).doesNotThrowAnyException();
         }
 
         @Test
         @DisplayName("when email changed and already in use – throws")
         void emailChangedAndInUse_throws() {
-            when(brokerAuthRepository.existsByEmail("taken@b.com")).thenReturn(true);
+            when(brokerRepository.existsByEmailIgnoreCase("taken@b.com")).thenReturn(true);
             assertThatThrownBy(() -> validator.ensureEmailUniqueIfChanged("old@b.com", "taken@b.com"))
                     .isInstanceOf(ValidationException.class)
                     .hasMessageContaining("New email address is already in use");

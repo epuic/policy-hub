@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record PolicyResponseDTO(
         @JsonProperty("id")
@@ -72,6 +73,57 @@ public record PolicyResponseDTO(
         LocalDate cancellationDate,
 
         @JsonProperty("cancellationReason")
-        String cancellationReason
+        String cancellationReason,
+
+        @JsonProperty("premiumAdjustments")
+        List<PremiumAdjustmentDTO> premiumAdjustments
 ) {
+        public PolicyResponseDTO(
+                Long id,
+                String policyNumber,
+                Long clientId,
+                String clientName,
+                Long buildingId,
+                String buildingAddress,
+                String cityName,
+                String countyName,
+                String countryName,
+                Long brokerId,
+                String brokerName,
+                PolicyStatus status,
+                LocalDate startDate,
+                LocalDate endDate,
+                BigDecimal basePremiumAmount,
+                String currencyCode,
+                BigDecimal finalPremium,
+                LocalDateTime createdAt,
+                LocalDateTime lastUpdatedAt,
+                LocalDate cancellationDate,
+                String cancellationReason
+        ) {
+                this(
+                        id,
+                        policyNumber,
+                        clientId,
+                        clientName,
+                        buildingId,
+                        buildingAddress,
+                        cityName,
+                        countyName,
+                        countryName,
+                        brokerId,
+                        brokerName,
+                        status,
+                        startDate,
+                        endDate,
+                        basePremiumAmount,
+                        currencyCode,
+                        finalPremium,
+                        createdAt,
+                        lastUpdatedAt,
+                        cancellationDate,
+                        cancellationReason,
+                        List.of()
+                );
+        }
 }

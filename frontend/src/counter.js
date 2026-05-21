@@ -1,1 +1,1 @@
-// Fișier nefolosit - moștenit din template Vite
+// Unused file inherited from the Vite template.

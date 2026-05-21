@@ -31,10 +31,14 @@ api.interceptors.response.use(
   },
 )
 
-export function apiError(err, fallback = 'A apărut o eroare') {
-  if (err?.response?.data?.message) return err.response.data.message
-  if (err?.response?.data?.details?.length)
-    return err.response.data.details.join(', ')
+export function apiError(err, fallback = 'An error occurred') {
+  const response = err?.response?.data
+  if (response?.message && response?.details?.length) {
+    return `${response.message}\n${response.details.filter(Boolean).join('\n')}`
+  }
+  if (response?.message) return response.message
+  if (response?.details?.length) return response.details.filter(Boolean).join('\n')
+  if (response?.error) return response.error
   if (err?.message) return err.message
   return fallback
 }

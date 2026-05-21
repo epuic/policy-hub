@@ -5,20 +5,20 @@ export function cn(...inputs) {
 }
 
 export function formatDate(value) {
-  if (!value) return '—'
+  if (!value) return '-'
   try {
     const d = typeof value === 'string' ? new Date(value) : value
-    return d.toLocaleDateString('ro-RO', { year: 'numeric', month: 'short', day: '2-digit' })
+    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' })
   } catch {
     return String(value)
   }
 }
 
 export function formatDateTime(value) {
-  if (!value) return '—'
+  if (!value) return '-'
   try {
     const d = typeof value === 'string' ? new Date(value) : value
-    return d.toLocaleString('ro-RO', {
+    return d.toLocaleString('en-US', {
       year: 'numeric',
       month: 'short',
       day: '2-digit',
@@ -31,11 +31,11 @@ export function formatDateTime(value) {
 }
 
 export function formatMoney(amount, currency = 'RON') {
-  if (amount === null || amount === undefined) return '—'
+  if (amount === null || amount === undefined) return '-'
   const n = typeof amount === 'string' ? parseFloat(amount) : amount
-  if (Number.isNaN(n)) return '—'
+  if (Number.isNaN(n)) return '-'
   try {
-    return new Intl.NumberFormat('ro-RO', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency,
       maximumFractionDigits: 2,
@@ -46,8 +46,14 @@ export function formatMoney(amount, currency = 'RON') {
 }
 
 export function formatNumber(n) {
-  if (n === null || n === undefined) return '—'
-  return new Intl.NumberFormat('ro-RO').format(n)
+  if (n === null || n === undefined) return '-'
+  return new Intl.NumberFormat('en-US').format(n)
+}
+
+export function numberOrNull(value) {
+  if (value === null || value === undefined || value === '') return null
+  const number = Number(value)
+  return Number.isNaN(number) ? null : number
 }
 
 export function initials(name = '') {

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Filter, ScrollText } from 'lucide-react'
+import { Plus, Filter, ScrollText, X } from 'lucide-react'
 import { Card, CardBody } from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Select from '../../components/ui/Select'
-import Input from '../../components/ui/Input'
+import DatePicker from '../../components/ui/DatePicker'
 import Badge from '../../components/ui/Badge'
 import Spinner from '../../components/ui/Spinner'
 import EmptyState from '../../components/ui/EmptyState'
@@ -28,13 +28,13 @@ export default function PoliciesList() {
     endDateTo: '',
   })
 
-  const fetch = async () => {
+  const fetch = async (nextFilters = filters, nextPage = page) => {
     setLoading(true)
     try {
-      const params = { page, size: 10 }
-      if (filters.status) params.status = filters.status
-      if (filters.startDateFrom) params.startDateFrom = filters.startDateFrom
-      if (filters.endDateTo) params.endDateTo = filters.endDateTo
+      const params = { page: nextPage, size: 10 }
+      if (nextFilters.status) params.status = nextFilters.status
+      if (nextFilters.startDateFrom) params.startDateFrom = nextFilters.startDateFrom
+      if (nextFilters.endDateTo) params.endDateTo = nextFilters.endDateTo
       const res = await policiesApi.list(params)
       setData(res)
     } catch (err) {
@@ -51,7 +51,16 @@ export default function PoliciesList() {
 
   const applyFilter = () => {
     setPage(0)
-    fetch()
+    fetch(filters, 0)
+  }
+
+  const hasFilters = Boolean(filters.status || filters.startDateFrom || filters.endDateTo)
+
+  const clearFilters = () => {
+    const emptyFilters = { status: '', startDateFrom: '', endDateTo: '' }
+    setFilters(emptyFilters)
+    setPage(0)
+    fetch(emptyFilters, 0)
   }
 
   return (
@@ -59,83 +68,80 @@ export default function PoliciesList() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-            Politici
+            Policies
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Toate politicile gestionate
+            All managed policies
           </p>
         </div>
-        <Button
-          leftIcon={<Plus className="h-4 w-4" />}
-          onClick={() => navigate('/broker/policies/new')}
-        >
-          Poliță nouă
+        <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => navigate('/broker/policies/new')}>
+          New Policy
         </Button>
       </div>
 
       <Card>
-        <CardBody className="border-b border-slate-100 dark:border-slate-800">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-            <Select
-              label="Status"
-              value={filters.status}
-              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-              placeholder="Toate"
-              options={POLICY_STATUSES}
-            />
-            <Input
-              type="date"
-              label="Start de la"
-              value={filters.startDateFrom}
-              onChange={(e) =>
-                setFilters({ ...filters, startDateFrom: e.target.value })
-              }
-            />
-            <Input
-              type="date"
-              label="Final până la"
-              value={filters.endDateTo}
-              onChange={(e) => setFilters({ ...filters, endDateTo: e.target.value })}
-            />
-            <Button onClick={applyFilter} leftIcon={<Filter className="h-4 w-4" />}>
-              Aplică filtre
-            </Button>
+        <CardBody className="border-b border-slate-100 p-4 dark:border-slate-800">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-2 dark:border-slate-800 dark:bg-slate-950/30">
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-[1.1fr_1fr_1fr_auto_auto] md:items-end">
+              <Select
+                value={filters.status}
+                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                placeholder="Any status"
+                options={POLICY_STATUSES}
+                className="h-11 rounded-xl border-0 bg-white shadow-sm dark:bg-slate-900"
+              />
+              <DatePicker
+                label="Start"
+                value={filters.startDateFrom}
+                onChange={(value) => setFilters({ ...filters, startDateFrom: value })}
+                placeholder="Start date"
+                className="h-11 rounded-xl border-0 bg-white shadow-sm dark:bg-slate-900"
+              />
+              <DatePicker
+                label="End"
+                value={filters.endDateTo}
+                onChange={(value) => setFilters({ ...filters, endDateTo: value })}
+                placeholder="End date"
+                className="h-11 rounded-xl border-0 bg-white shadow-sm dark:bg-slate-900"
+              />
+              {hasFilters && (
+                <Button type="button" variant="ghost" onClick={clearFilters} leftIcon={<X className="h-4 w-4" />}>
+                  Clear
+                </Button>
+              )}
+              <Button type="button" onClick={applyFilter} leftIcon={<Filter className="h-4 w-4" />}>
+                Filter
+              </Button>
+            </div>
           </div>
         </CardBody>
         {loading ? (
           <Spinner />
         ) : data.content.length === 0 ? (
-          <EmptyState
-            icon={ScrollText}
-            title="Nicio poliță"
-            message="Nu există politici care corespund filtrelor"
-          />
+          <EmptyState icon={ScrollText} title="No policies" message="No policies match the current filters" />
         ) : (
           <>
             <Table>
               <THead>
                 <TR>
-                  <TH>Nr. Poliță</TH>
+                  <TH>Policy No.</TH>
                   <TH>Client</TH>
-                  <TH>Clădire</TH>
-                  <TH>Perioadă</TH>
-                  <TH>Primă finală</TH>
+                  <TH>Building</TH>
+                  <TH>Period</TH>
+                  <TH>Final Premium</TH>
                   <TH>Status</TH>
                 </TR>
               </THead>
               <TBody>
                 {data.content.map((p) => (
-                  <TR
-                    key={p.id}
-                    onClick={() => navigate(`/broker/policies/${p.id}`)}
-                  >
+                  <TR key={p.id} onClick={() => navigate(`/broker/policies/${p.id}`)}>
                     <TD className="font-medium text-slate-900 dark:text-slate-100">
                       {p.policyNumber}
                     </TD>
                     <TD>{p.clientName}</TD>
                     <TD className="truncate max-w-[240px]">{p.buildingAddress}</TD>
                     <TD className="text-xs">
-                      {formatDate(p.startDate)} → {formatDate(p.endDate)}
+                      {formatDate(p.startDate)} to {formatDate(p.endDate)}
                     </TD>
                     <TD>{formatMoney(p.finalPremium, p.currencyCode)}</TD>
                     <TD>
@@ -145,11 +151,7 @@ export default function PoliciesList() {
                 ))}
               </TBody>
             </Table>
-            <Pagination
-              page={data.number || 0}
-              totalPages={data.totalPages || 0}
-              onChange={setPage}
-            />
+            <Pagination page={data.number || 0} totalPages={data.totalPages || 0} onChange={setPage} />
           </>
         )}
       </Card>

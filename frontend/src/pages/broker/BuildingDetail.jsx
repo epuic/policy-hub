@@ -5,7 +5,6 @@ import {
   Pencil,
   Plus,
   Building2,
-  MapPin,
   Calendar,
   Layers,
   Ruler,
@@ -22,11 +21,7 @@ import { buildingsApi } from '../../api/buildings'
 import { useToast } from '../../contexts/ToastContext'
 import { apiError } from '../../lib/api'
 import { formatDate, formatMoney, formatNumber } from '../../lib/utils'
-import {
-  labelFor,
-  BUILDING_TYPES,
-  RISK_FACTOR_TYPES,
-} from '../../utils/constants'
+import { labelFor, BUILDING_TYPES, RISK_FACTOR_TYPES } from '../../utils/constants'
 
 export default function BuildingDetail() {
   const { buildingId } = useParams()
@@ -44,7 +39,7 @@ export default function BuildingDetail() {
       .finally(() => setLoading(false))
   }, [buildingId])
 
-  if (loading) return <Spinner label="Se încarcă..." />
+  if (loading) return <Spinner label="Loading..." />
   if (!b) return null
 
   const InfoBox = ({ icon: Icon, label, value, accent = 'brand' }) => (
@@ -62,31 +57,18 @@ export default function BuildingDetail() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          leftIcon={<ArrowLeft className="h-4 w-4" />}
-          onClick={() => navigate(`/broker/clients/${b.clientId}`)}
-        >
-          Înapoi la client
+        <Button variant="ghost" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate(`/broker/clients/${b.clientId}`)}>
+          Back to Client
         </Button>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            leftIcon={<Pencil className="h-4 w-4" />}
-            onClick={() => navigate(`/broker/buildings/${buildingId}/edit`)}
-          >
-            Editează
+          <Button variant="outline" leftIcon={<Pencil className="h-4 w-4" />} onClick={() => navigate(`/broker/buildings/${buildingId}/edit`)}>
+            Edit
           </Button>
           <Button
             leftIcon={<Plus className="h-4 w-4" />}
-            onClick={() =>
-              navigate(
-                `/broker/policies/new?clientId=${b.clientId}&buildingId=${b.id}`,
-              )
-            }
+            onClick={() => navigate(`/broker/policies/new?clientId=${b.clientId}&buildingId=${b.id}`)}
           >
-            Poliță nouă
+            New Policy
           </Button>
         </div>
       </div>
@@ -109,11 +91,8 @@ export default function BuildingDetail() {
                 </div>
               </div>
               <div className="mt-3">
-                <Link
-                  to={`/broker/clients/${b.clientId}`}
-                  className="text-xs text-brand-600 hover:underline"
-                >
-                  Client: {b.clientName} →
+                <Link to={`/broker/clients/${b.clientId}`} className="text-xs text-brand-600 hover:underline">
+                  Client: {b.clientName}
                 </Link>
               </div>
             </div>
@@ -121,14 +100,10 @@ export default function BuildingDetail() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
-            <InfoBox icon={Calendar} label="An construcție" value={b.constructionYear} />
-            <InfoBox icon={Layers} label="Etaje" value={b.numberOfFloors} />
-            <InfoBox icon={Ruler} label="Suprafață" value={`${formatNumber(b.surfaceArea)} m²`} />
-            <InfoBox
-              icon={DollarSign}
-              label="Valoare asigurată"
-              value={formatMoney(b.insuredValue, 'RON')}
-            />
+            <InfoBox icon={Calendar} label="Construction Year" value={b.constructionYear} />
+            <InfoBox icon={Layers} label="Floors" value={b.numberOfFloors} />
+            <InfoBox icon={Ruler} label="Surface Area" value={`${formatNumber(b.surfaceArea)} sqm`} />
+            <InfoBox icon={DollarSign} label="Insured Value" value={formatMoney(b.insuredValue, 'RON')} />
           </div>
 
           {b.riskFactorTypes?.length > 0 && (
@@ -136,7 +111,7 @@ export default function BuildingDetail() {
               <div className="flex items-center gap-2 mb-2">
                 <ShieldAlert className="h-4 w-4 text-amber-500" />
                 <span className="text-xs uppercase tracking-wider text-slate-500">
-                  Factori de risc
+                  Risk Factors
                 </span>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -152,24 +127,14 @@ export default function BuildingDetail() {
       </Card>
 
       <Card>
-        <CardHeader
-          title="Politici de asigurare"
-          subtitle="Politici asociate acestei clădiri"
-        />
+        <CardHeader title="Insurance Policies" subtitle="Policies linked to this building" />
         {(!b.policies || b.policies.length === 0) ? (
           <EmptyState
-            title="Nicio poliță"
-            message="Creează o poliță pentru această clădire"
+            title="No policies"
+            message="Create a policy for this building"
             action={
-              <Button
-                leftIcon={<Plus className="h-4 w-4" />}
-                onClick={() =>
-                  navigate(
-                    `/broker/policies/new?clientId=${b.clientId}&buildingId=${b.id}`,
-                  )
-                }
-              >
-                Creează poliță
+              <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => navigate(`/broker/policies/new?clientId=${b.clientId}&buildingId=${b.id}`)}>
+                Create Policy
               </Button>
             }
           />
@@ -177,10 +142,10 @@ export default function BuildingDetail() {
           <Table>
             <THead>
               <TR>
-                <TH>Număr</TH>
+                <TH>Number</TH>
                 <TH>Start</TH>
-                <TH>Final</TH>
-                <TH>Primă</TH>
+                <TH>End</TH>
+                <TH>Premium</TH>
                 <TH>Status</TH>
               </TR>
             </THead>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Save } from 'lucide-react'
 import { Card, CardBody, CardHeader } from '../../components/ui/Card'
@@ -9,6 +9,7 @@ import { buildingsApi } from '../../api/buildings'
 import { geographyApi } from '../../api/geography'
 import { useToast } from '../../contexts/ToastContext'
 import { apiError } from '../../lib/api'
+import { numberOrNull } from '../../lib/utils'
 import { BUILDING_TYPES, RISK_FACTOR_TYPES } from '../../utils/constants'
 
 export default function BuildingForm() {
@@ -68,7 +69,6 @@ export default function BuildingForm() {
     buildingsApi
       .get(buildingId)
       .then(async (b) => {
-        // Try to infer address parts from fullAddress (street + number combined server-side)
         setForm({
           street: b.fullAddress?.replace(/\s*\d+\s*$/, '').trim() || '',
           number: (b.fullAddress?.match(/\d+$/) || [''])[0],
@@ -85,8 +85,7 @@ export default function BuildingForm() {
       .finally(() => setLoading(false))
   }, [buildingId])
 
-  const change = (k) => (e) =>
-    setForm({ ...form, [k]: e.target.value })
+  const change = (k) => (e) => setForm({ ...form, [k]: e.target.value })
 
   const toggleRisk = (type) => {
     setForm((f) => ({
@@ -103,19 +102,19 @@ export default function BuildingForm() {
     try {
       const payload = {
         ...form,
-        cityId: Number(form.cityId),
-        constructionYear: Number(form.constructionYear),
-        numberOfFloors: Number(form.numberOfFloors),
-        surfaceArea: Number(form.surfaceArea),
-        insuredValue: Number(form.insuredValue),
+        cityId: numberOrNull(form.cityId),
+        constructionYear: numberOrNull(form.constructionYear),
+        numberOfFloors: numberOrNull(form.numberOfFloors),
+        surfaceArea: numberOrNull(form.surfaceArea),
+        insuredValue: numberOrNull(form.insuredValue),
       }
       if (isEdit) {
         await buildingsApi.update(buildingId, payload)
-        toast.success('Clădire actualizată')
+        toast.success('Building updated')
         navigate(`/broker/buildings/${buildingId}`)
       } else {
         const created = await buildingsApi.create(clientId, payload)
-        toast.success('Clădire creată')
+        toast.success('Building created')
         navigate(`/broker/buildings/${created.id}`)
       }
     } catch (err) {
@@ -127,68 +126,53 @@ export default function BuildingForm() {
 
   return (
     <div className="space-y-5 max-w-4xl">
-      <Button
-        variant="ghost"
-        size="sm"
-        leftIcon={<ArrowLeft className="h-4 w-4" />}
-        onClick={() => navigate(-1)}
-      >
-        Înapoi
+      <Button variant="ghost" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate(-1)}>
+        Back
       </Button>
 
       <Card>
         <CardHeader
-          title={isEdit ? 'Editează clădire' : 'Clădire nouă'}
-          subtitle="Completează detaliile clădirii asigurate"
+          title={isEdit ? 'Edit Building' : 'New Building'}
+          subtitle="Complete insured building details"
         />
         <CardBody>
-          <form onSubmit={submit} className="space-y-6">
+          <form onSubmit={submit} noValidate className="space-y-6">
             <div>
               <h4 className="text-xs uppercase tracking-wider text-slate-500 mb-3">
-                Adresa
+                Address
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="md:col-span-3">
-                  <Input
-                    label="Stradă"
-                    value={form.street}
-                    onChange={change('street')}
-                    required
-                  />
+                  <Input label="Street" value={form.street} onChange={change('street')} required />
                 </div>
-                <Input
-                  label="Număr"
-                  value={form.number}
-                  onChange={change('number')}
-                  required
-                />
+                <Input label="Number" value={form.number} onChange={change('number')} required />
                 <Select
-                  label="Țară"
+                  label="Country"
                   value={selectedCountry}
                   onChange={(e) => {
                     setSelectedCountry(e.target.value)
                     setSelectedCounty('')
                     setForm((f) => ({ ...f, cityId: '' }))
                   }}
-                  placeholder="Selectează țara"
+                  placeholder="Select country"
                   options={countries.map((c) => ({ value: c.id, label: c.name }))}
                 />
                 <Select
-                  label="Județ"
+                  label="County"
                   value={selectedCounty}
                   onChange={(e) => {
                     setSelectedCounty(e.target.value)
                     setForm((f) => ({ ...f, cityId: '' }))
                   }}
-                  placeholder="Selectează județul"
+                  placeholder="Select county"
                   options={counties.map((c) => ({ value: c.id, label: c.name }))}
                   disabled={!selectedCountry}
                 />
                 <Select
-                  label="Oraș"
+                  label="City"
                   value={form.cityId}
                   onChange={change('cityId')}
-                  placeholder="Selectează orașul"
+                  placeholder="Select city"
                   options={cities.map((c) => ({ value: c.id, label: c.name }))}
                   disabled={!selectedCounty}
                   required={!isEdit}
@@ -198,58 +182,22 @@ export default function BuildingForm() {
 
             <div>
               <h4 className="text-xs uppercase tracking-wider text-slate-500 mb-3">
-                Caracteristici
+                Characteristics
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Select
-                  label="Tip"
-                  value={form.type}
-                  onChange={change('type')}
-                  options={BUILDING_TYPES}
-                />
-                <Input
-                  type="number"
-                  label="An construcție"
-                  value={form.constructionYear}
-                  onChange={change('constructionYear')}
-                  min={1800}
-                  max={new Date().getFullYear()}
-                  required
-                />
-                <Input
-                  type="number"
-                  label="Număr de etaje"
-                  value={form.numberOfFloors}
-                  onChange={change('numberOfFloors')}
-                  min={1}
-                  required
-                />
-                <Input
-                  type="number"
-                  step="0.01"
-                  label="Suprafață (m²)"
-                  value={form.surfaceArea}
-                  onChange={change('surfaceArea')}
-                  min={0}
-                  required
-                />
+                <Select label="Type" value={form.type} onChange={change('type')} options={BUILDING_TYPES} />
+                <Input type="number" label="Construction Year" value={form.constructionYear} onChange={change('constructionYear')} min={1800} max={new Date().getFullYear()} required />
+                <Input type="number" label="Number of Floors" value={form.numberOfFloors} onChange={change('numberOfFloors')} min={1} required />
+                <Input type="number" step="0.01" label="Surface Area (sqm)" value={form.surfaceArea} onChange={change('surfaceArea')} min={0} required />
                 <div className="md:col-span-2">
-                  <Input
-                    type="number"
-                    step="0.01"
-                    label="Valoare asigurată (RON)"
-                    value={form.insuredValue}
-                    onChange={change('insuredValue')}
-                    min={0}
-                    required
-                  />
+                  <Input type="number" step="0.01" label="Insured Value (RON)" value={form.insuredValue} onChange={change('insuredValue')} min={0} required />
                 </div>
               </div>
             </div>
 
             <div>
               <h4 className="text-xs uppercase tracking-wider text-slate-500 mb-3">
-                Factori de risc
+                Risk Factors
               </h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {RISK_FACTOR_TYPES.map((r) => {
@@ -263,12 +211,7 @@ export default function BuildingForm() {
                           : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                       }`}
                     >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => toggleRisk(r.value)}
-                        className="accent-brand-500"
-                      />
+                      <input type="checkbox" checked={checked} onChange={() => toggleRisk(r.value)} className="accent-brand-500" />
                       {r.label}
                     </label>
                   )
@@ -278,14 +221,10 @@ export default function BuildingForm() {
 
             <div className="flex gap-2 justify-end">
               <Button variant="outline" type="button" onClick={() => navigate(-1)}>
-                Anulează
+                Cancel
               </Button>
-              <Button
-                type="submit"
-                loading={saving || loading}
-                leftIcon={<Save className="h-4 w-4" />}
-              >
-                {isEdit ? 'Salvează' : 'Creează'}
+              <Button type="submit" loading={saving || loading} leftIcon={<Save className="h-4 w-4" />}>
+                {isEdit ? 'Save' : 'Create'}
               </Button>
             </div>
           </form>

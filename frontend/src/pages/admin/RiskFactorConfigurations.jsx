@@ -11,9 +11,16 @@ import EmptyState from '../../components/ui/EmptyState'
 import Pagination from '../../components/ui/Pagination'
 import { Table, THead, TH, TBody, TR, TD } from '../../components/ui/Table'
 import { riskFactorsApi } from '../../api/riskFactors'
+import { geographyApi } from '../../api/geography'
 import { useToast } from '../../contexts/ToastContext'
 import { apiError } from '../../lib/api'
-import { RISK_FACTOR_CONFIG_LEVELS, labelFor } from '../../utils/constants'
+import {
+  BUILDING_TYPES,
+  RISK_FACTOR_CONFIG_LEVELS,
+  RISK_FACTOR_TYPES,
+  labelFor,
+} from '../../utils/constants'
+import { numberOrNull } from '../../lib/utils'
 
 export default function RiskFactorConfigurations() {
   const toast = useToast()
@@ -28,6 +35,11 @@ export default function RiskFactorConfigurations() {
     adjustmentPercentage: 0,
     active: true,
   })
+  const [countries, setCountries] = useState([])
+  const [counties, setCounties] = useState([])
+  const [cities, setCities] = useState([])
+  const [selectedCountry, setSelectedCountry] = useState('')
+  const [selectedCounty, setSelectedCounty] = useState('')
   const [saving, setSaving] = useState(false)
 
   const fetch = async () => {
@@ -45,6 +57,38 @@ export default function RiskFactorConfigurations() {
     // eslint-disable-next-line
   }, [page])
 
+  useEffect(() => {
+    geographyApi
+      .adminCountries({ page: 0, size: 200 })
+      .then((d) => setCountries(d.content || []))
+      .catch((err) => toast.error(apiError(err)))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (!selectedCountry) {
+      setCounties([])
+      return
+    }
+    geographyApi
+      .adminCounties(selectedCountry, { page: 0, size: 300 })
+      .then((d) => setCounties(d.content || []))
+      .catch((err) => toast.error(apiError(err)))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCountry])
+
+  useEffect(() => {
+    if (!selectedCounty) {
+      setCities([])
+      return
+    }
+    geographyApi
+      .adminCities(selectedCounty, { page: 0, size: 500, buildingSize: 1 })
+      .then((d) => setCities(d.content || []))
+      .catch((err) => toast.error(apiError(err)))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCounty])
+
   const openCreate = () => {
     setEditing(null)
     setForm({
@@ -53,6 +97,8 @@ export default function RiskFactorConfigurations() {
       adjustmentPercentage: 0,
       active: true,
     })
+    setSelectedCountry('')
+    setSelectedCounty('')
     setOpen(true)
   }
 
@@ -64,7 +110,62 @@ export default function RiskFactorConfigurations() {
       adjustmentPercentage: r.adjustmentPercentage,
       active: r.active,
     })
+    setSelectedCountry(r.level === 'COUNTRY' ? r.referenceId || '' : '')
+    setSelectedCounty(r.level === 'COUNTY' ? r.referenceId || '' : '')
     setOpen(true)
+  }
+
+  const changeLevel = (e) => {
+    setForm({ ...form, level: e.target.value, referenceId: '' })
+    setSelectedCountry('')
+    setSelectedCounty('')
+  }
+
+  const selectCountry = (countryId) => {
+    setSelectedCountry(countryId)
+    setSelectedCounty('')
+    setForm({ ...form, referenceId: form.level === 'COUNTRY' ? countryId : '' })
+  }
+
+  const selectCounty = (countyId) => {
+    setSelectedCounty(countyId)
+    setForm({ ...form, referenceId: form.level === 'COUNTY' ? countyId : '' })
+  }
+
+  const referenceOptions = () => {
+    if (form.level === 'COUNTRY') {
+      return countries.map((c) => ({ value: c.id, label: c.name }))
+    }
+    if (form.level === 'COUNTY') {
+      return counties.map((c) => ({ value: c.id, label: c.name }))
+    }
+    if (form.level === 'CITY') {
+      return cities.map((c) => ({ value: c.id, label: c.name }))
+    }
+    if (form.level === 'BUILDING_TYPE') {
+      return BUILDING_TYPES
+    }
+    if (form.level === 'RISK_FACTOR_TYPE') {
+      return RISK_FACTOR_TYPES
+    }
+    return []
+  }
+
+  const currentReferenceOption = () => {
+    if (!editing?.referenceId || editing.referenceId !== form.referenceId) return null
+    const exists = referenceOptions().some(
+      (option) => String(option.value) === String(form.referenceId),
+    )
+    if (exists) return null
+    return {
+      value: editing.referenceId,
+      label: editing.referenceName || editing.referenceId,
+    }
+  }
+
+  const referenceSelectOptions = () => {
+    const current = currentReferenceOption()
+    return current ? [current, ...referenceOptions()] : referenceOptions()
   }
 
   const save = async (e) => {
@@ -73,15 +174,15 @@ export default function RiskFactorConfigurations() {
     try {
       const payload = {
         ...form,
-        adjustmentPercentage: Number(form.adjustmentPercentage),
+        adjustmentPercentage: numberOrNull(form.adjustmentPercentage),
         referenceId: form.referenceId || null,
       }
       if (editing) {
         await riskFactorsApi.update(editing.id, payload)
-        toast.success('Ajustare actualizată')
+        toast.success('Adjustment updated')
       } else {
         await riskFactorsApi.create(payload)
-        toast.success('Ajustare creată')
+        toast.success('Adjustment created')
       }
       setOpen(false)
       fetch()
@@ -97,14 +198,14 @@ export default function RiskFactorConfigurations() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-            Ajustări factori de risc
+            Risk Factor Adjustments
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Configurări procentuale per nivel
+            Percentage configuration by level
           </p>
         </div>
         <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
-          Ajustare nouă
+          New Adjustment
         </Button>
       </div>
 
@@ -112,17 +213,17 @@ export default function RiskFactorConfigurations() {
         {loading ? (
           <Spinner />
         ) : data.content.length === 0 ? (
-          <EmptyState icon={ShieldAlert} title="Nicio ajustare" />
+          <EmptyState icon={ShieldAlert} title="No adjustments" />
         ) : (
           <>
             <Table>
               <THead>
                 <TR>
-                  <TH>Nivel</TH>
-                  <TH>Referință</TH>
-                  <TH>Ajustare</TH>
-                  <TH>Activ</TH>
-                  <TH className="text-right">Acțiuni</TH>
+                  <TH>Level</TH>
+                  <TH>Reference</TH>
+                  <TH>Adjustment</TH>
+                  <TH>Active</TH>
+                  <TH className="text-right">Actions</TH>
                 </TR>
               </THead>
               <TBody>
@@ -134,7 +235,7 @@ export default function RiskFactorConfigurations() {
                       </Badge>
                     </TD>
                     <TD className="text-slate-700 dark:text-slate-200">
-                      {r.referenceName || r.referenceId || '—'}
+                      {r.referenceName || r.referenceId || '-'}
                     </TD>
                     <TD>
                       <span
@@ -150,16 +251,12 @@ export default function RiskFactorConfigurations() {
                     </TD>
                     <TD>
                       <Badge variant={r.active ? 'success' : 'muted'}>
-                        {r.active ? 'ACTIV' : 'INACTIV'}
+                        {r.active ? 'ACTIVE' : 'INACTIVE'}
                       </Badge>
                     </TD>
                     <TD>
                       <div className="flex justify-end">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => openEdit(r)}
-                        >
+                        <Button size="icon" variant="ghost" onClick={() => openEdit(r)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
                       </div>
@@ -168,11 +265,7 @@ export default function RiskFactorConfigurations() {
                 ))}
               </TBody>
             </Table>
-            <Pagination
-              page={data.number || 0}
-              totalPages={data.totalPages || 0}
-              onChange={setPage}
-            />
+            <Pagination page={data.number || 0} totalPages={data.totalPages || 0} onChange={setPage} />
           </>
         )}
       </Card>
@@ -180,25 +273,54 @@ export default function RiskFactorConfigurations() {
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title={editing ? 'Editează ajustare' : 'Ajustare nouă'}
+        title={editing ? 'Edit Adjustment' : 'New Adjustment'}
       >
-        <form onSubmit={save} className="space-y-4">
+        <form onSubmit={save} noValidate className="space-y-4">
           <Select
-            label="Nivel"
+            label="Level"
             value={form.level}
-            onChange={(e) => setForm({ ...form, level: e.target.value })}
+            onChange={changeLevel}
             options={RISK_FACTOR_CONFIG_LEVELS}
           />
-          <Input
-            label="ID referință"
-            value={form.referenceId}
-            onChange={(e) => setForm({ ...form, referenceId: e.target.value })}
-            hint="ID țară/județ/oraș sau valoare enum (opțional)"
-          />
+          {(form.level === 'COUNTRY' ||
+            form.level === 'COUNTY' ||
+            form.level === 'CITY') && (
+            <Select
+              label="Country"
+              value={selectedCountry}
+              onChange={(e) => selectCountry(e.target.value)}
+              placeholder="Select country"
+              options={countries.map((c) => ({ value: c.id, label: c.name }))}
+            />
+          )}
+          {(form.level === 'COUNTY' || form.level === 'CITY') && (
+            <Select
+              label="County"
+              value={selectedCounty}
+              onChange={(e) => selectCounty(e.target.value)}
+              placeholder="Select county"
+              options={counties.map((c) => ({ value: c.id, label: c.name }))}
+              disabled={!selectedCountry && !form.referenceId}
+            />
+          )}
+          {(form.level === 'CITY' ||
+            form.level === 'BUILDING_TYPE' ||
+            form.level === 'RISK_FACTOR_TYPE') && (
+            <Select
+              label="Reference"
+              value={form.referenceId}
+              onChange={(e) => setForm({ ...form, referenceId: e.target.value })}
+              placeholder={
+                form.level === 'CITY' ? 'Select city' : 'Select reference'
+              }
+              options={referenceSelectOptions()}
+              disabled={form.level === 'CITY' && !selectedCounty}
+            />
+          )}
           <Input
             type="number"
             step="0.01"
-            label="Procent ajustare (%)"
+            label="Adjustment Percentage (%)"
             value={form.adjustmentPercentage}
             onChange={(e) =>
               setForm({ ...form, adjustmentPercentage: e.target.value })
@@ -206,7 +328,7 @@ export default function RiskFactorConfigurations() {
             min={-100}
             max={100}
             required
-            hint="Valoare negativă pentru discount"
+            hint="Negative value means discount"
           />
           <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
             <input
@@ -215,14 +337,14 @@ export default function RiskFactorConfigurations() {
               checked={form.active}
               onChange={(e) => setForm({ ...form, active: e.target.checked })}
             />
-            Activă
+            Active
           </label>
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" type="button" onClick={() => setOpen(false)}>
-              Anulează
+              Cancel
             </Button>
             <Button type="submit" loading={saving}>
-              Salvează
+              Save
             </Button>
           </div>
         </form>

@@ -43,7 +43,7 @@ export default function Sidebar({ items = [], title = 'Insurance Platform', subt
       </nav>
 
       <div className="p-4 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400">
-        v1.0.0 · Endava
+        Insurance Platform
       </div>
     </aside>
   )

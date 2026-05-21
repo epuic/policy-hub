@@ -9,6 +9,7 @@ import { brokersApi } from '../../api/brokers'
 import { useToast } from '../../contexts/ToastContext'
 import { apiError } from '../../lib/api'
 import { BROKER_STATUSES } from '../../utils/constants'
+import { numberOrNull } from '../../lib/utils'
 
 export default function BrokerForm() {
   const { id } = useParams()
@@ -57,23 +58,27 @@ export default function BrokerForm() {
       if (isEdit) {
         await brokersApi.update(id, {
           name: form.name,
-          email: form.email || null,
+          email: form.email.trim(),
           phone: form.phone || null,
           commissionPercentage:
             form.commissionPercentage === ''
               ? null
-              : Number(form.commissionPercentage),
+              : numberOrNull(form.commissionPercentage),
         })
-        toast.success('Broker actualizat')
+        toast.success('Broker updated')
       } else {
         await brokersApi.create({
-          ...form,
+          name: form.name,
+          email: form.email.trim(),
+          phone: form.phone || null,
+          password: form.password,
+          status: form.status,
           commissionPercentage:
             form.commissionPercentage === ''
               ? null
-              : Number(form.commissionPercentage),
+              : numberOrNull(form.commissionPercentage),
         })
-        toast.success('Broker creat')
+        toast.success('Broker created')
       }
       navigate('/admin/brokers')
     } catch (err) {
@@ -91,53 +96,44 @@ export default function BrokerForm() {
         leftIcon={<ArrowLeft className="h-4 w-4" />}
         onClick={() => navigate('/admin/brokers')}
       >
-        Brokeri
+        Brokers
       </Button>
 
       <Card>
         <CardHeader
-          title={isEdit ? 'Editează broker' : 'Broker nou'}
+          title={isEdit ? 'Edit Broker' : 'New Broker'}
           subtitle={
             isEdit
-              ? 'Actualizează detaliile brokerului'
-              : 'Creează un nou cont de broker'
+              ? 'Update broker details'
+              : 'Create a new broker account'
           }
         />
         <CardBody>
-          <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={submit} noValidate className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {isEdit && (
+              <Input
+                label="Broker Code"
+                value={form.brokerCode}
+                disabled
+                hint="Generated automatically on creation"
+              />
+            )}
+            <Input label="Name" value={form.name} onChange={change('name')} required />
+            <Input type="email" label="Email" value={form.email} onChange={change('email')} required />
             <Input
-              label="Cod broker"
-              value={form.brokerCode}
-              onChange={change('brokerCode')}
-              disabled={isEdit}
-              required={!isEdit}
-            />
-            <Input
-              label="Nume"
-              value={form.name}
-              onChange={change('name')}
-              required
-            />
-            <Input
-              type="email"
-              label="Email"
-              value={form.email}
-              onChange={change('email')}
-            />
-            <Input
-              label="Telefon"
+              label="Phone"
               value={form.phone}
               onChange={change('phone')}
-              hint="10-15 cifre, opțional +"
+              hint="10-15 digits, optional +"
             />
             {!isEdit && (
               <Input
                 type="password"
-                label="Parolă"
+                label="Password"
                 value={form.password}
                 onChange={change('password')}
                 required
-                hint="Minim 8 caractere"
+                hint="Minimum 8 characters"
               />
             )}
             <Select
@@ -150,7 +146,7 @@ export default function BrokerForm() {
             <Input
               type="number"
               step="0.01"
-              label="Comision (%)"
+              label="Commission (%)"
               value={form.commissionPercentage}
               onChange={change('commissionPercentage')}
               min={0}
@@ -162,14 +158,14 @@ export default function BrokerForm() {
                 type="button"
                 onClick={() => navigate('/admin/brokers')}
               >
-                Anulează
+                Cancel
               </Button>
               <Button
                 type="submit"
                 loading={saving || loading}
                 leftIcon={<Save className="h-4 w-4" />}
               >
-                {isEdit ? 'Salvează' : 'Creează'}
+                {isEdit ? 'Save' : 'Create'}
               </Button>
             </div>
           </form>

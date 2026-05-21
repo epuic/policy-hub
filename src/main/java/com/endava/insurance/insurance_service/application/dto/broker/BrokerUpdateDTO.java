@@ -12,6 +12,7 @@ public record BrokerUpdateDTO(
         @JsonProperty("name")
         String name,
 
+        @NotBlank(message = "Email is required")
         @Email(message = "Invalid email format")
         @JsonProperty("email")
         String email,

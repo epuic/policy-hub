@@ -39,7 +39,7 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={toast}>
       {children}
-      <div className="fixed top-5 right-5 z-[100] flex flex-col gap-2 w-[min(400px,calc(100vw-2.5rem))]">
+      <div className="fixed left-1/2 top-1/2 z-[100] flex w-[min(460px,calc(100vw-2.5rem))] -translate-x-1/2 -translate-y-1/2 flex-col gap-2">
         {toasts.map((t) => {
           const Icon = ICONS[t.type] || Info
           return (
@@ -58,7 +58,7 @@ export function ToastProvider({ children }) {
               >
                 <Icon className="h-4 w-4" />
               </div>
-              <div className="flex-1 text-sm pt-0.5 text-slate-800 dark:text-slate-100">
+              <div className="flex-1 whitespace-pre-line text-sm pt-0.5 text-slate-800 dark:text-slate-100">
                 {t.message}
               </div>
               <button

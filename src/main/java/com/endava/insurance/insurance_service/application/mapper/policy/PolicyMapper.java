@@ -1,25 +1,31 @@
 package com.endava.insurance.insurance_service.application.mapper.policy;
 
+import com.endava.insurance.insurance_service.application.dto.policy.PremiumAdjustmentDTO;
 import com.endava.insurance.insurance_service.application.dto.policy.PolicyCreateDTO;
 import com.endava.insurance.insurance_service.application.dto.policy.PolicyResponseDTO;
 import com.endava.insurance.insurance_service.application.dto.policy.PolicySummaryDTO;
+import com.endava.insurance.insurance_service.application.service.premium.PolicyPremiumCalculator;
 import com.endava.insurance.insurance_service.domain.exception.ValidationException;
 import com.endava.insurance.insurance_service.domain.model.Broker;
 import com.endava.insurance.insurance_service.domain.model.Building;
 import com.endava.insurance.insurance_service.domain.model.Client;
 import com.endava.insurance.insurance_service.domain.model.Policy;
 import com.endava.insurance.insurance_service.domain.model.metadata.Currency;
+import com.endava.insurance.insurance_service.persistence.repository.PolicyPremiumAdjustmentRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class PolicyMapper {
 
     private final EntityManager entityManager;
+    private final PolicyPremiumCalculator premiumCalculator;
+    private final PolicyPremiumAdjustmentRepository premiumAdjustmentRepository;
 
     public Policy toEntity(PolicyCreateDTO request, String policyNumber, BigDecimal finalPremium) throws ValidationException {
         Client client = entityManager.getReference(Client.class, request.clientId());
@@ -52,6 +58,23 @@ public class PolicyMapper {
                 building.getStreet(), 
                 building.getNumber(), 
                 city.getName());
+        List<PremiumAdjustmentDTO> premiumAdjustments = premiumAdjustmentRepository
+                .findByPolicyIdOrderByIdAsc(policy.getId())
+                .stream()
+                .map(adjustment -> new PremiumAdjustmentDTO(
+                        adjustment.getCategory(),
+                        adjustment.getLabel(),
+                        adjustment.getPercentage(),
+                        adjustment.getAmount()
+                ))
+                .toList();
+        if (premiumAdjustments.isEmpty()) {
+            premiumAdjustments = premiumCalculator.getPremiumAdjustments(
+                    policy.getBasePremiumAmount(),
+                    building,
+                    policy.getStartDate()
+            );
+        }
 
         return new PolicyResponseDTO(
                 policy.getId(),
@@ -74,7 +97,8 @@ public class PolicyMapper {
                 policy.getCreatedAt(),
                 policy.getLastUpdatedAt(),
                 policy.getCancellationDate(),
-                policy.getCancellationReason()
+                policy.getCancellationReason(),
+                premiumAdjustments
         );
     }
 

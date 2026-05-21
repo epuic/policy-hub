@@ -22,7 +22,7 @@ public class Broker {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     private String phone;
@@ -49,7 +49,7 @@ public class Broker {
         this.brokerCode = brokerCode.trim();
         this.name = name.trim();
         this.email = email.trim();
-        this.phone = phone.trim();
+        this.phone = phone != null ? phone.trim() : null;
         this.status = status;
         this.commissionPercentage = commissionPercentage;
     }
@@ -63,7 +63,7 @@ public class Broker {
 
         this.name = name.trim();
         this.email = email.trim();
-        this.phone = phone.trim();
+        this.phone = phone != null ? phone.trim() : null;
         this.commissionPercentage = commissionPercentage;
     }
 

@@ -2,7 +2,14 @@ import { useEffect } from 'react'
 import { cn } from '../../lib/utils'
 import { X } from 'lucide-react'
 
-export default function Modal({ open, onClose, title, children, size = 'md' }) {
+export default function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  size = 'md',
+  contentClassName,
+}) {
   useEffect(() => {
     if (!open) return
     const handler = (e) => e.key === 'Escape' && onClose?.()
@@ -48,7 +55,12 @@ export default function Modal({ open, onClose, title, children, size = 'md' }) {
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="p-5 max-h-[calc(100vh-10rem)] overflow-auto">
+        <div
+          className={cn(
+            'p-5 max-h-[calc(100vh-10rem)] overflow-auto',
+            contentClassName,
+          )}
+        >
           {children}
         </div>
       </div>

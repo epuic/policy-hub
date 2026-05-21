@@ -14,8 +14,12 @@ public class BrokerUniquenessValidator {
     private final BrokerAuthRepository brokerAuthRepository;
 
     public void ensureEmailUnique(String email) throws ValidationException {
-        if (email != null && !email.trim().isEmpty() && brokerAuthRepository.existsByEmail(email)) {
-            throw new ValidationException("Email address is already in use: " + email);
+        if (email != null && !email.trim().isEmpty()) {
+            String emailTrimmed = email.trim();
+            if (brokerRepository.existsByEmailIgnoreCase(emailTrimmed)
+                    || brokerAuthRepository.existsByEmailIgnoreCase(emailTrimmed)) {
+                throw new ValidationException("Email address is already in use: " + emailTrimmed);
+            }
         }
     }
 
@@ -29,7 +33,9 @@ public class BrokerUniquenessValidator {
         if (newEmail != null && !newEmail.trim().isEmpty()) {
             String existingEmailTrimmed = existingEmail != null ? existingEmail.trim() : "";
             String newEmailTrimmed = newEmail.trim();
-            if (!existingEmailTrimmed.equals(newEmailTrimmed) && brokerAuthRepository.existsByEmail(newEmailTrimmed)) {
+            if (!existingEmailTrimmed.equalsIgnoreCase(newEmailTrimmed)
+                    && (brokerRepository.existsByEmailIgnoreCase(newEmailTrimmed)
+                    || brokerAuthRepository.existsByEmailIgnoreCase(newEmailTrimmed))) {
                 throw new ValidationException("New email address is already in use by another broker.");
             }
         }
